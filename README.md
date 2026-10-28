@@ -35,7 +35,7 @@ PASS                // 取栈顶项检查，TRUE时则通过，否则失败
 - `DATA{46af3fb4...}`：预置的公钥哈希序列入栈。**栈状态**：`[<flag>, <sig>, <pubKey>, <pubHash>, <preHash>]`
 - `EQUAL`：取栈顶2项（`<preHash>`、`<pubHash>`）相等比较，结果（true|false）入栈。**栈状态**：`[<flag>, <sig>, <pubKey>, <true|false>]`
 - `PASS`：取栈顶项检查，TRUE时则通过，否则失败。**栈状态**：`[<flag>, <sig>, <pubKey>]`
-- `FN_CHECKSIG`：取栈顶4项（当前全部），验证签名。结果（true|false）入栈。**栈状态**：`[<true|false>]`
+- `FN_CHECKSIG`：取栈顶3项（当前全部），验证签名。结果（true|false）入栈。**栈状态**：`[<true|false>]`
 - `PASS`：取栈顶项检查，TRUE时则通过，否则失败。**栈状态**：`[]`
 
 
