@@ -12,8 +12,8 @@
 ```go
 // 解锁脚本：
 <flag>              // 授权标识
-<sig>               // 签名入栈
-<pubKey>            // 公钥入栈
+<Sig>               // 签名（系统占位符，运行时入栈签名）
+<PubKey>            // 公钥（系统占位符，运行时入栈公钥）
 
 // 锁定脚本：
 TOP                 // 引用栈顶项（不弹出）返回入栈
@@ -28,12 +28,12 @@ PASS                // 取栈顶项检查，TRUE时则通过，否则失败
 **解释：**
 
 - `<flag>`：授权标识入栈。**栈状态**：`[<flag>]`
-- `<sig>`：自动入栈签名。**栈状态**：`[<flag>, <sig>]`
-- `<pubKey>`：自动入栈公钥。**栈状态**：`[<flag>, <sig>, <pubKey>]`
+- `<Sig>`：自动入栈签名。**栈状态**：`[<flag>, <sig>]`
+- `<PubKey>`：自动入栈公钥。**栈状态**：`[<flag>, <sig>, <pubKey>]`
 - `TOP`：取栈顶项（`<pubKey>`）返回入栈。**栈状态**：`[<flag>, <sig>, <pubKey>, <pubKey>]`
 - `FN_PUBHASH`：取栈顶项（`<pubKey>`）计算公钥哈希后入栈。**栈状态**：`[<flag>, <sig>, <pubKey>, <pubHash>]`
 - `DATA{46af3fb4...}`：预置的公钥哈希序列入栈。**栈状态**：`[<flag>, <sig>, <pubKey>, <pubHash>, <preHash>]`
-- `EQUAL`：取栈顶2项（`<preHash>`、`<pubHash>`）相等比较，结果（true|false）入栈。**栈状态**：`[<flag>, <sig>, <pubKey>, <true|false>]`
+- `EQUAL`：取栈顶2项（`<pubHash>`、`<preHash>`）相等比较，结果（true|false）入栈。**栈状态**：`[<flag>, <sig>, <pubKey>, <true|false>]`
 - `PASS`：取栈顶项检查，TRUE时则通过，否则失败。**栈状态**：`[<flag>, <sig>, <pubKey>]`
 - `FN_CHECKSIG`：取栈顶3项（当前全部），验证签名。结果（true|false）入栈。**栈状态**：`[<true|false>]`
 - `PASS`：取栈顶项检查，TRUE时则通过，否则失败。**栈状态**：`[]`
