@@ -2,6 +2,7 @@
 
 - 状态：Accepted
 - 日期：2026-10-28
+- 修订：2026-11-01（并入作者回答：Time 的运算由 `MO_TIME` 提供）
 - 覆盖评审条目：P0-4、P1-1、P1-2、P2-5（Q5、Q9）
 
 
@@ -58,6 +59,9 @@ Nil、Bool、Byte、Rune、Int（int64）、BigInt（绝对值不超过 1016 位
 - `LT` / `LTE` / `GT` / `GTE`：只用于数值、String、Bytes、Time，且两边类别相同，否则失败。String 与 Bytes 按字节从左到右比较。
 - `WITHIN`：只用于数值，按构想层的类型清单。
 - 私有域的 Float 按 IEEE 754 比较，NaN 不等于任何值。
+- Time 与 Int 属于不同类别：`EQUAL` 返回「不相等」，`LT` 等即失败。需要与时间戳比较时，先用 `INT(Time)` 或 `TIME(Int)` 转换。
+
+Time 不参与运算指令（`ADD`、`SUB` 等对 Time 即失败）。时长加减等运算由 `MO_TIME` 模块的方法提供（作者回答）。
 
 ### 6. 拼接与合并
 
@@ -139,8 +143,6 @@ Nil 流入后续指令时：参与算术即失败；`BOOL(Nil)` 为 false；`EQU
 
 ## 开放问题
 
-1. Time 值是否支持运算（例如加减时长），以及 Time 与 Int 时间戳的比较，由 Spec 定义；本 Decision 只规定 Time 之间按时刻比较。
-2. BigInt 的 `MOD`、`POW` 留待将来的模块提供（构想层已写明）。
+1. BigInt 的 `MOD`、`POW` 留待将来的模块提供（构想层已写明）。
 
-> **作者回答：**
-> `Time` 的运算也由单独的模块 `MO_TIME` 支持。
+已关闭（2026-11-01）：Time 的运算由 `MO_TIME` 提供（作者回答），Time 与 Int 的比较按跨类别处理，写入第 5 条。
