@@ -2,7 +2,7 @@
 
 - 状态：Accepted
 - 日期：2026-10-28
-- 修订：2026-11-01（`FN_ADDRESS` 改由宿主定义，见 DEC-0002）
+- 修订：2026-11-01（`FN_ADDRESS` 改由宿主定义，见 DEC-0002）；2026-11-04（`FN_BASE58` 不含校验和；Evidcoin 地址改为 Bech32v）
 - 覆盖评审条目：P0-5（Q10、Q11）
 
 
@@ -42,7 +42,7 @@
 | 字符串编码 | UTF-8（RFC 3629） |
 | 签名验证 | 由宿主规格指定（见 DEC-0002），如 ML-DSA（FIPS 204）、SLH-DSA（FIPS 205） |
 
-`FN_BASE58` 没有正式标准，归入第一类：Spec 自行写明字母表（Bitcoin 字母表）和前导零的编码规则。`FN_ADDRESS`、`FN_PUBHASH`、`FN_MPUBHASH` 实现的是宿主的公钥哈希与地址方案（前缀、哈希算法、校验码），由宿主规格定义（DEC-0002）。
+`FN_BASE58` 没有正式标准，归入第一类：Spec 自行写明字母表（Bitcoin 字母表）和前导零的编码规则。它只是纯粹的 Base58 编解码，不含校验和（不是 Base58Check，构想层 `16.函数指令.md`）。`FN_ADDRESS`、`FN_PUBHASH`、`FN_MPUBHASH` 实现的是宿主的公钥哈希与地址方案，由宿主规格定义（DEC-0002）；Evidcoin 的地址编码 Bech32v 以 Bech32m（BIP 350）为基础，宿主规格须引用该标准并写明差异。
 
 ### 3. 第三类行为的处理
 
