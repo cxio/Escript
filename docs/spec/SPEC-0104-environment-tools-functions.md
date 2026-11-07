@@ -126,8 +126,6 @@ while count < limit and pos ≤ len(input):
 - 结果属于源码类（上限 16KB，SPEC-0006 第 1 条）。
 - 成本：`K`，`D` 为结果字节数。
 
-构想层示例（`13.环境指令.md`）中，U 为 `<hashSource>`，L 为 `DATA ~ END`。按本条，`<Source.1>` 处的 `SOURCE[0x80]` 为 `<hashSource> ~ END`，`SOURCE[0x81]` 为 `<hashSource> ~ <Source.1>`，与标识的说明（「含解锁部分」「含解锁脚本」）及 `<Source.2>` 处的同名取值一致。构想层在 `<Source.1>` 处写作 `DATA ~ END`、`DATA ~ <Source.1>`，按勘误处理。构想层提示「脚本顶层的块域包含解锁脚本」按 `0x00` 的说明（顶层不含解锁段）与 `<Source.2>` 的示例理解：解锁段只在跨块取码时与锁定段相连。
-
 ### 3. 工具指令 `[138-163]`
 
 #### 3.1 `EVAL`（138）
