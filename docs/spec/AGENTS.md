@@ -25,15 +25,15 @@
 | SPEC-0003 | `SPEC-0003-load-validation.md` | 加载期校验：段与加载时点、加载步骤、规范解码、结构规则、表达式文法、模式体、段级规则、加载期成本 |
 | SPEC-0004 | `SPEC-0004-value-model.md` | 值模型：类型、Float 规则、数值提升、比较、值语义、`size` |
 | SPEC-0005 | `SPEC-0005-execution-model.md` | 执行模型：状态、实参与去向、块与局部域、通关状态机、结果、公共 / 私有执行、GOTO / EMBED / EVAL / MAP / FILTER、循环与 SWITCH、校验域 |
-| SPEC-0006 | `SPEC-0006-limits-and-cost.md` | 硬限额与检查时点、成本框架与计费时点、初始成本表、三层预算 |
-| SPEC-0007 | `SPEC-0007-versioning.md` | 版本号、每段的版本、版本冻结的表、未分配与未知版本即失败、跨版本规则、升级规则 |
-| SPEC-0008 | `SPEC-0008-host-interface.md` | 宿主接口：宿主规格的必备内容、`ENV` 索引划分与核心字段、环境、接口契约、执行结果与标记、私有执行 |
-| SPEC-0101 | （待编写） | 值、截取、栈操作、集合、交互、流程控制、结果指令的语义 |
-| SPEC-0102 | （待编写） | 转换、运算、比较、逻辑指令的语义 |
-| SPEC-0103 | （待编写） | MODEL 与模式指令（含类型标识表） |
-| SPEC-0104 | （待编写） | 环境、工具、系统、函数指令的语义（含 `SOURCE`、`RANDOM`、哈希与编码算法） |
-| SPEC-0105 | （待编写） | 模块与扩展指令，v1 静态方法表与 `CALL` 方法集（评审者起草，作者审定） |
-| SPEC-0106 | （待编写） | 私有专属指令与私有域通道 |
+| SPEC-0006 | `SPEC-0006-limits-and-cost.md` | 硬限额与检查时点、成本框架与计费时点、成本记法（`K`、`B(x)`）、初始成本表、三层预算 |
+| SPEC-0007 | `SPEC-0007-versioning.md` | 版本号、每段的版本、版本冻结的表、未分配与未知版本即失败、跨版本规则、升级规则（预发布） |
+| SPEC-0008 | `SPEC-0008-host-interface.md` | 宿主接口：宿主规格的必备内容、`ENV` 索引划分与核心字段、环境、接口契约、创建时的检查、执行结果与标记、私有执行 |
+| SPEC-0101 | `SPEC-0101-core-instructions.md` | 指令语义的通用约定（0101–0106 共用）；值、截取、栈操作、集合、交互、结果、流程控制指令 |
+| SPEC-0102 | `SPEC-0102-conversion-arithmetic.md` | 转换（含 `INT` / `TIME` 的文本文法、UTF-8 解码）、运算、比较、逻辑指令 |
+| SPEC-0103 | `SPEC-0103-model-matching.md` | MODEL：目标解码、模式单元、深匹配、`^?` 的部分编码、类型标识表、范围与正则、求解与回溯、取值、成本 |
+| SPEC-0104 | `SPEC-0104-environment-tools-functions.md` | 正则约定与全部匹配算法；环境（含 `SOURCE`）、工具（`MATCH`、`REPLACE`、`RANDOM`、`CALL` 等）、系统、函数（编码与哈希）指令 |
+| SPEC-0105 | `SPEC-0105-module-methods.md` | 模块与扩展：调用方式、v1 方法表（`MO_TIME`、`MO_RE`、`MO_BINT`、`MO_MATH`、`MO_FMT`、Dict 的 `CALL` 方法；评审者起草，作者审定） |
+| SPEC-0106 | `SPEC-0106-private-execution.md` | 私有执行：Float、私有通道、`SYS_TIME`、`SHELL`、`FN_PRIV` / `EXT_PRIV`、值的默认文本形式 |
 | SPEC-0201 | （待编写） | 文本语法（编译 / 反编译）与 EBNF |
 | SPEC-0202 | （待编写） | 测试向量格式 |
 | SPEC-0901 | （待编写） | Evidcoin 宿主规格 |
