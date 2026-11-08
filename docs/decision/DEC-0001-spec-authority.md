@@ -2,7 +2,7 @@
 
 - 状态：Accepted
 - 日期：2026-10-28
-- 修订：2026-11-01（`FN_ADDRESS` 改由宿主定义，见 DEC-0002）；2026-11-04（`FN_BASE58` 不含校验和；Evidcoin 地址改为 Bech32v）
+- 修订：2026-11-01（`FN_ADDRESS` 改由宿主定义，见 DEC-0002）；2026-11-04（`FN_BASE58` 不含校验和；Evidcoin 地址改为 Bech32v）；2026-11-08（`STRING(Byte)` 按 ASCII〔R-24〕；`MO_TIME` 公共方法补固定偏移换算与时刻运算〔R-33〕）
 - 覆盖评审条目：P0-5（Q10、Q11）
 
 
@@ -50,10 +50,10 @@
 | --- | --- |
 | 正则 | 保留在公共域。规格写明「RE2 语法 + Unicode 版本 X」，X 取参考实现所用 Go 工具链的 `unicode.Version`。CI 断言该值。将来升级 Go 而 Unicode 版本变化时，把 `regexp` 及其 Unicode 表固化一份到项目内，不跟随升级 |
 | `MO_FMT` | 私有域专属。公共节点上的 `PRINT`、`FN_PRINTF` 本来就是空操作，不受影响 |
-| 时间 | 公共域只开放数值读取：年、月、日、时、分、秒、毫秒、Unix 时间戳（毫秒），时区只认 UTC 和固定偏移。`Format`、`Local`、`In` 等依赖格式化或时区数据库的方法为私有域专属。`MO_TIME` 与 Time 对象的方法表按此标注公/私（见 DEC-0004） |
+| 时间 | 公共域开放数值读取（年、月、日、时、分、秒、毫秒、Unix 时间戳）以及只依赖整数运算的固定偏移换算与时刻运算（`UTC`、`InOffset`、`AddMilli`、`AddDate`、`Sub`〔R-33〕）。时区只认 UTC 和固定偏移。`Format`、`Local`、`In` 等依赖格式化或时区数据库的方法为私有域专属。`MO_TIME` 与 Time 对象的方法表按此标注公/私（见 DEC-0004） |
 | 随机数 | 采用构想层 `RANDOM` / `SLRAND` 已写明的 BLAKE3 keyed + XOF 算法，见第 4 条 |
 | 变长整数 | 规范解码规则见 DEC-0003 |
-| `strconv` / `math/big` | 由 Spec 定义：`INT(String)` 接受的文本文法（按构想层：可选符号、十进制或 `0b` / `0o` / `0x` 前缀、数字间单下划线分隔）；`STRING(Int)` / `STRING(BigInt)` 在 2–36 进制下的输出格式（小写字母、无前导零）；`STRING(Byte)` / `STRING(Rune)` 的「合法字符」按合法 Unicode 标量值判定，不使用随 Unicode 版本变化的「可打印」判断；BigInt 的位运算语义（二进制补码，见 DEC-0005） |
+| `strconv` / `math/big` | 由 Spec 定义：`INT(String)` 接受的文本文法（按构想层：可选符号、十进制或 `0b` / `0o` / `0x` 前缀、数字间单下划线分隔）；`STRING(Int)` / `STRING(BigInt)` 在 2–36 进制下的输出格式（小写字母、无前导零）；`STRING(Byte)` 按 ASCII（0x20–0x7E 为该字符，控制字符与 ≥0x80 为 `\xhh`〔R-24〕）；`STRING(Rune)` 的合法字符按合法 Unicode 标量值判定，不使用随 Unicode 版本变化的「可打印」判断；BigInt 的位运算语义（二进制补码，见 DEC-0005） |
 | 数据栈 `[]any` | 属于实现细节。Spec 按 DEC-0005 的值模型定义数据栈，不涉及 Go 类型 |
 
 ### 4. 随机数算法的补充约定
@@ -105,4 +105,4 @@
 ## 开放问题
 
 1. 正则 Unicode 版本的初值，在参考实现选定 Go 工具链时记录。
-2. `FN_BASE58` 的输入长度上限与成本，见 DEC-0007。
+2. `FN_BASE58` 的长度上限与成本，见 DEC-0007（编码限制实参、解码限制结果，均为 256 字节；已确认）。
