@@ -2,6 +2,7 @@
 
 - 状态：草案，待作者审定
 - 日期：2026-11-06
+- 修订：2026-11-08（`SLRAND` 的 Bytes 改为写明的友好支持，DEC-0005 第 1 条）
 
 
 ## 来源追溯
@@ -10,7 +11,7 @@
 - `conception/Instruction/14.工具指令.md`：`EVAL` ～ `SHELL`，`RANDOM` / `SLRAND` 的算法
 - `conception/Instruction/15.系统指令.md`、`16.函数指令.md`
 - DEC-0002 第 1、2 条（环境字段与签名属于宿主；授权标识）
-- DEC-0005 第 10 条（异常归类）
+- DEC-0005 第 1 条（`SLRAND` 接受 Bytes）、第 10 条（异常归类）
 - DEC-0006 第 1、5、12 条（脚本域、EVAL 的禁用指令、校验域）
 - DEC-0007 第 2、3 条（成本）
 - SPEC-0005 第 11、13 条（子执行、校验域与 NULL 点）、SPEC-0008（宿主接口）
@@ -201,7 +202,7 @@ uniform(n), n ≥ 1 = r = (2⁶⁴ − n) mod n；循环 x = next64()，直到 x
   - Int：上界 ≥ 1，否则失败；返回 Int，即 uniform(上界)。
   - Float（私有）：上界必须是正的有限数，否则失败；返回 Float，即 (next64() >> 11) / 2⁵³ × 上界。
   - 其它类型即失败，包括 Byte、Rune（上界不属于 SPEC-0101 第 1.2 条的整数类实参）。
-- **`SLRAND`**：tag 为 `"Escript/SLRAND/v1"`。实参 2 为切片（含 Bytes）。复制为 t，i 从 len(t) − 1 递减到 1：j = uniform(i + 1)，交换 t[i] 与 t[j]（Fisher–Yates）。全部抽取来自同一个流。返回 t，成员类型与实参 2 相同。
+- **`SLRAND`**：tag 为 `"Escript/SLRAND/v1"`。实参 2 为切片或 Bytes（DEC-0005 第 1 条，Bytes 按字节重排）。复制为 t，i 从 len(t) − 1 递减到 1：j = uniform(i + 1)，交换 t[i] 与 t[j]（Fisher–Yates）。全部抽取来自同一个流。返回 t，与实参 2 同类型，切片的成员类型不变。
 - 成本：`RANDOM` 为 `K + 20`；`SLRAND` 为 `K + 20 + m`，m 为成员数（Bytes：`D` 为字节数）。
 
 #### 3.8 `CMPFLO[k]`（146）

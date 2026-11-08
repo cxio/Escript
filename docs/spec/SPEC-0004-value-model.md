@@ -2,7 +2,7 @@
 
 - 状态：草案，待作者审定
 - 日期：2026-11-01
-- 修订：2026-11-06（按字节计的成本改用 SPEC-0006 第 2.1 条的 `D`，`size` 只用于单项大小上限）
+- 修订：2026-11-06（按字节计的成本改用 SPEC-0006 第 2.1 条的 `D`，`size` 只用于单项大小上限）；2026-11-08（Bytes 与 `[]Byte` 分为两个类型，DEC-0005 第 1 条）
 
 
 ## 来源追溯
@@ -11,8 +11,8 @@
 - DEC-0004 第 1 条（Script 携带版本）
 - DEC-0001 第 3 条（时间只认 UTC 与固定偏移；数据栈 `[]any` 属于实现细节）
 - `conception/Instruction/1.值指令.md`：各值类型、值集的提升规则、`DICT`
-- `conception/Instruction/4.集合指令.md`：切片、字典、Bytes 作为 `[]Byte`
-- `conception/Instruction/8.转换指令.md`：`TIME`、`BYTES(Time)`
+- `conception/Instruction/4.集合指令.md`：切片、字典，集合指令对 Bytes 的友好支持
+- `conception/Instruction/8.转换指令.md`：`TIME`、`BYTES(Time)`；Bytes 不是 `[]Byte`
 - `conception/Instruction/12.模式指令.md`：类型名清单
 
 
@@ -37,7 +37,7 @@
 | BigInt | 绝对值小于 2¹⁰¹⁶ 的整数 | 6 | 否 |
 | Float | IEEE 754 binary64，**私有执行专用** | 7 | 否 |
 | String | 字节序列，按 UTF-8 解释但不检查合法性 | 8 | 否 |
-| Bytes | 字节序列，即成员类型为 Byte 的切片 | 10 | 否 |
+| Bytes | 字节序列（不是切片） | 10 | 否 |
 | RegExp | 一个已编译的 RE2 正则及其源文本 | 11 | 否 |
 | Time | 毫秒时刻与固定时区偏移〔R-05〕 | 12 | 否 |
 | Script | 字节码与版本号 | 16、17 | 否 |
@@ -57,7 +57,11 @@
 
 **String 与 Bytes。** 两者都是字节序列，但属于不同类型，不会隐式互相转换。String 的「字符」操作（`SUBSTR`、`RUNES` 等）按 UTF-8 解码，非法字节的处理由各指令规定。
 
-**Bytes 与切片。** Bytes 就是成员类型为 Byte 的切片：`SLICE`、`INDEX`、`SIZE` 等切片操作对它适用，`INDEX` 取出的成员是 Byte（DEC-0005 第 1 条）。值集 `{'A', 'B'}` 的结果就是 Bytes。
+**Bytes 与 `[]Byte`。** 两者是不同的类型（DEC-0005 第 1 条）。Bytes 是一个整体的字节序列，与 String 一样是普通数据项；`[]Byte` 是成员类型为 Byte 的切片，与 `[]Int` 等一样适用切片的全部规则。
+
+- 只有写明接受 Bytes 的指令才对 Bytes 适用（SPEC-0101 第 1.2 条），其余要求切片之处，Bytes 即失败。
+- 互转：`ANYS{Byte}` 把 Bytes 转为 `[]Byte`，`BYTES` 把 `[]Byte` 转为 Bytes（SPEC-0102）。
+- 成员全为 Byte 的值集 `{'A', 'B'}` 的结果是 `[]Byte`；Bytes 的字面量是 `DATA`（opcode 10）。
 
 **切片的成员类型。** 每个切片带一个成员类型 E：E 可以是任一值类型，也可以是 `any`。成员类型为 E 的切片记作 `[]E`，其中每个成员都是 E 类型；`[]any` 的成员可以是任意值。切片的成员类型由产生它的指令决定（例如值集按成员的提升结果，`SHIFT` 产生 `[]any`，`RANGE` 产生 `[]Int`），见各指令的规格。
 
@@ -109,9 +113,9 @@
 | Script | Script | 按字节（不比较版本） | 不可以 |
 | Bool | Bool | 按值 | 不可以 |
 | Nil | Nil | 只等于 Nil | 不可以 |
-| 不可比较 | 成员类型不是 Byte 的切片、Dict、RegExp、模块对象 | 失败 | 失败 |
+| 不可比较 | 切片（包括 `[]Byte`）、Dict、RegExp、模块对象 | 失败 | 失败 |
 
-- 两边属于不同类别时：`EQUAL` 为 `false`、`NEQUAL` 为 `true`，不失败；`LT` 等大小比较即失败。任一边是不可比较的类型时，相等与大小比较都失败（DEC-0005 第 5 条）。
+- 两边属于不同类别时：`EQUAL` 为 `false`、`NEQUAL` 为 `true`，不失败；`LT` 等大小比较即失败。任一边是不可比较的类型时，相等与大小比较都失败（DEC-0005 第 5 条）。例如 Bytes 与内容相同的 `[]Byte` 比较即失败。
 - 数值的提升按第 4 条；Byte 65 等于 Int 65，Int 与值相同的 BigInt 相等。私有执行中 BigInt 与 Float 比较即失败。
 - Float 按 IEEE 754 比较：NaN 不等于任何值（包括自身），`+0` 等于 `-0`。
 - Time 与 Int 属于不同类别（DEC-0005 第 5 条）。
@@ -139,7 +143,7 @@
 | String、Bytes | 字节数 |
 | RegExp | 源文本的字节数 |
 | Script | 字节码的字节数 |
-| 其它切片 | 各成员 `size` 之和 |
+| 切片 | 各成员 `size` 之和 |
 | Dict | 各条目「键的字节数 + 值的 `size`」之和 |
 | 模块对象 | 1 |
 
@@ -160,7 +164,7 @@
 
 ## 对 Plan 的约束
 
-- 值的内部表示必须能区分 String 与 Bytes、Byte 与 Int、Int 与值相同的 BigInt，以及切片的成员类型。
+- 值的内部表示必须能区分 String 与 Bytes、Bytes 与 `[]Byte`、Byte 与 Int、Int 与值相同的 BigInt，以及切片的成员类型。
 - Float 与 `[]Float` 的构造必须集中在一个函数中，该函数在公共执行中直接失败。
 - Time 的实现不得调用依赖时区数据库的方法（如 `time.LoadLocation`、`Local`）参与公共执行。
 - 测试向量须覆盖第 5 条表中每一对类别的相等与大小比较。

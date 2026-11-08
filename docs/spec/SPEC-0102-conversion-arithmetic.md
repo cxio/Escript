@@ -2,15 +2,16 @@
 
 - 状态：草案，待作者审定
 - 日期：2026-11-06
+- 修订：2026-11-08（Bytes 与 `[]Byte` 分立：`BYTE(Bytes)`、`BYTES([]Byte)`、`ANYS{Byte}` 接受 Bytes，DEC-0005 第 7 条）
 
 
 ## 来源追溯
 
-- `conception/Instruction/8.转换指令.md`：转换表、`STRING` 的格式标识、`ANYS`
+- `conception/Instruction/8.转换指令.md`：转换表、`STRING` 的格式标识、`ANYS`；`BYTES([]Byte)`、`ANYS{Byte}` 对 Bytes 的转换
 - `conception/Instruction/9.运算指令.md`：表达式、符号指令、命名运算指令、`DIVMOD`、`REP`、`DEL`、`CLEAR`
 - `conception/Instruction/10.比较指令.md`、`11.逻辑指令.md`
 - DEC-0001 第 2、3 条（RFC 3339、UTF-8；`strconv` / `math/big` 的行为由 Spec 定义）
-- DEC-0005 第 2–7、10 条（Float、提升、溢出、比较、拼接与合并、转换的补充规则）
+- DEC-0005 第 1–7、10 条（Bytes 与 `[]Byte`、Float、提升、溢出、比较、拼接与合并、转换的补充规则）
 - DEC-0006 第 10 条（表达式的求值）
 - SPEC-0004（值模型）、SPEC-0005 第 8 条（表达式）、SPEC-0101 第 1 条（通用约定）
 
@@ -46,13 +47,13 @@ Float 只在私有执行中出现。本篇写出 Float 的规则，供私有执�
 | BigInt | ≠ 0 | 0–255 ① | 合法码点 ② | int64 范围 ① | 原值 | 失败 |
 | Float | ≠ 0，NaN 为 true | 失败 | 失败 | 向零截断 ③ | 失败 | 原值 |
 | String | ≠ "" | 失败 | 失败 | 文本解析（2.2） | 失败 | 文本解析（SPEC-0106 第 2 条） |
-| Bytes | 失败 | 失败 | 失败 | 恰好 8 字节，大端二进制补码 ① | 大端无符号 ④ | 失败 |
+| Bytes | 失败 | 恰好 1 字节，取该字节 ① | 失败 | 恰好 8 字节，大端二进制补码 ① | 大端无符号 ④ | 失败 |
 | Time | 失败 | 失败 | 失败 | 毫秒时刻 | 失败 | 失败 |
 
-① 超出范围（或长度不是 8）即失败。② 不超过 `0x10FFFF` 且不在 `0xD800–0xDFFF`，否则失败（DEC-0005 第 7 条）。③ NaN、±Inf，或截断后超出 int64，即失败。④ 空 Bytes 为 0；结果只能是非负数（DEC-0005 第 7 条）；绝对值达到 2¹⁰¹⁶ 即失败。
+① 超出范围（或 Bytes 的长度不符）即失败。② 不超过 `0x10FFFF` 且不在 `0xD800–0xDFFF`，否则失败（DEC-0005 第 7 条）。③ NaN、±Inf，或截断后超出 int64，即失败。④ 空 Bytes 为 0；结果只能是非负数（DEC-0005 第 7 条）；绝对值达到 2¹⁰¹⁶ 即失败。
 
 - `BOOL` 不接受切片、Bytes、Dict（DEC-0005 第 7 条）。判断非空用 `SIZE BOOL`。
-- `INT(Bytes)` 与 `BYTES(Int)` 互逆。
+- `INT(Bytes)` 与 `BYTES(Int)` 互逆，`BYTE(Bytes)` 与 `BYTES(Byte)` 互逆（DEC-0005 第 7 条）。从 Bytes 中按位置读取单个字节用 `INDEX`（SPEC-0101 第 5.7 条）。
 - 成本：`K`；`INT(String)` 为 `K + B(输入字节)`；`BIGINT` 的 `D` 为结果字节数。
 
 #### 2.2 `INT(String)` 的文法〔R-24〕
@@ -106,6 +107,7 @@ hex    = d16 { [ "_" ] d16 }
 | BigInt | 绝对值的大端字节，最少字节数；0 为空。符号丢失（DEC-0005 第 7 条） |
 | String | 同样的字节，不检查 UTF-8 |
 | Bytes | 原值 |
+| `[]Byte` | 各成员依次组成的字节序列（构想层） |
 | `[]Rune` | 各成员的 UTF-8 编码首尾相接 |
 | Script | 字节码，不含版本。结果属于源码类，上限 16KB〔R-26〕 |
 | Time | 毫秒时刻的 `varint` 编码（SPEC-0002 第 2.1 条），与 `DATE` 的数据相同 |
@@ -175,7 +177,7 @@ date-time = 年 "-" 月 "-" 日 ( "T" | "t" ) 时 ":" 分 ":" 秒 [ "." 1*DIGIT 
 | --- | --- | --- |
 | 0 | Nil 或任一切片 | `[]any`，成员不变；Nil 得到空的 `[]any` |
 | 1、2 | Nil 或 `[]any` | `[]Bool`，每个成员按 `BOOL` 转换 |
-| 3 | 同上 | Bytes，每个成员按 `BYTE` 转换 |
+| 3 | 同上，或 Bytes | `[]Byte`：`[]any` 的每个成员按 `BYTE` 转换；Bytes 的每个字节成为一个成员 |
 | 4 | 同上 | `[]Rune`，按 `RUNE` |
 | 5 | 同上 | `[]Int`，按 `INT` |
 | 6 | 同上 | `[]BigInt`，按 `BIGINT` |
@@ -183,6 +185,7 @@ date-time = 年 "-" 月 "-" 日 ( "T" | "t" ) 时 ":" 分 ":" 秒 [ "." 1*DIGIT 
 | 8 | 同上 | `[]String`，按 `STRING`（附参 0） |
 
 - k ≥ 1 时，实参是 Nil 得到该类型的空切片；实参是 `[]any` 以外的切片即失败（构想层只列了 `NIL|[]any`）。
+- 只有 k = 3 接受 Bytes（构想层 `DATA{...} ANYS{Byte}`）；其它 k，包括 0，遇到 Bytes 即失败（DEC-0005 第 7 条）。需要成员为 Byte 的 `[]any` 时，先 `ANYS{Byte}` 再 `ANYS[0]`。结果是切片，Bytes 超过 1024 字节即失败（SPEC-0006 第 1 条）。
 - 任一成员不能转换即失败（DEC-0005 第 7 条）。例：`{0} NIL TRUE SHIFT[3] ANYS{Bool}` 得到 `[false, false, true]`（构想层）。
 - 成本：`K + m`，`D` 为结果中新产生的 String、BigInt 等的字节数。
 

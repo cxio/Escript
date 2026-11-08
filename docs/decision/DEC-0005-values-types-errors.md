@@ -2,7 +2,7 @@
 
 - 状态：Accepted
 - 日期：2026-10-28
-- 修订：2026-11-01（并入作者回答：Time 的运算由 `MO_TIME` 提供）；2026-11-06（开放问题 1 关闭：BigInt 的取模与幂由 `MO_BINT` 提供）
+- 修订：2026-11-01（并入作者回答：Time 的运算由 `MO_TIME` 提供）；2026-11-06（开放问题 1 关闭：BigInt 的取模与幂由 `MO_BINT` 提供）；2026-11-08（作者决定：Bytes 与 `[]Byte` 是两个类型，取消别名；第 1、5、6、7、8 条相应修订）
 - 覆盖评审条目：P0-4、P1-1、P1-2、P2-5（Q5、Q9）
 
 
@@ -19,7 +19,9 @@
 
 Nil、Bool、Byte、Rune、Int（int64）、BigInt（绝对值不超过 1016 位）、Float（float64，私有域）、String、Bytes、RegExp、Time、Script、切片（具体类型的切片与 `[]any`）、Dict、模块 / 对象。
 
-- **Bytes 即 `[]Byte`**，可以 `SLICE`、`INDEX`、`SIZE`。
+- **Bytes 与 `[]Byte` 是两个类型**（作者决定，取消第一轮回答中的别名含义）。Bytes 是一个整体的字节序列，与 String 同属普通数据项（DEC-0007），可以比较、拼接。`[]Byte` 是成员类型为 Byte 的切片，与 `[]Int` 等一样适用切片的全部规则：受成员数上限约束，不可比较。
+- **Bytes 只在写明的指令中代替切片**：`SLICE`、`REVERSE`、`MERGE`、`EXTEND`、`PACK`、`INDEX`、`SIZE`（构想层 `4.集合指令.md`）与 `SLRAND`（`14.工具指令.md`）。`INDEX` 的单个位置得到 Byte；位置集总是得到值集，目标为 Bytes 时得到 `[]Byte`。其余要求切片的指令，包括 `SPREAD`、`EACH`、`MAP`、`FILTER`，不接受 Bytes，需先用 `ANYS{Byte}` 转为 `[]Byte`（第 7 条）。
+- 成员全为 Byte 的值集得到 `[]Byte`（构想层 `1.值指令.md`）；Bytes 的字面量是 `DATA`。
 - **String 不检查 UTF-8 合法性**，按字节比较。
 - Script 携带版本号（DEC-0004）。
 
@@ -55,7 +57,7 @@ Nil、Bool、Byte、Rune、Int（int64）、BigInt（绝对值不超过 1016 位
 
 ### 5. 比较
 
-- `EQUAL` / `NEQUAL`：数值类先提升再按值比较（Byte 65 等于 Int 65，Int 与值相同的 BigInt 相等）；String 与 String、Bytes 与 Bytes、Script 与 Script 按字节比较；Time 按时刻比较；Bool 与 Bool 比较；Nil 只等于 Nil。两边类别不同时结果为「不相等」，不失败。切片、字典、RegExp、模块 / 对象不可比较，比较即失败。
+- `EQUAL` / `NEQUAL`：数值类先提升再按值比较（Byte 65 等于 Int 65，Int 与值相同的 BigInt 相等）；String 与 String、Bytes 与 Bytes、Script 与 Script 按字节比较；Time 按时刻比较；Bool 与 Bool 比较；Nil 只等于 Nil。两边类别不同时结果为「不相等」，不失败。切片（包括 `[]Byte`）、字典、RegExp、模块 / 对象不可比较，比较即失败；因此 Bytes 与 `[]Byte` 比较是失败，而不是「不相等」。
 - `LT` / `LTE` / `GT` / `GTE`：只用于数值、String、Bytes、Time，且两边类别相同，否则失败。String 与 Bytes 按字节从左到右比较。
 - `WITHIN`：只用于数值，按构想层的类型清单。
 - 私有域的 Float 按 IEEE 754 比较，NaN 不等于任何值。
@@ -66,6 +68,7 @@ Time 不参与运算指令（`ADD`、`SUB` 等对 Time 即失败）。时长加�
 ### 6. 拼接与合并
 
 - `ADD` 只允许 String + String、Bytes + Bytes，混用即失败。结果受单项大小上限约束（DEC-0007）。
+- `MERGE` 的实参全为 Bytes 时，结果是首尾相接的 Bytes；Bytes 与切片（包括 `[]Byte`）混用即失败。`EXTEND` 的目标为 Bytes 时，追加的成员必须是 Byte，结果为 Bytes。
 - 字典合并（`ADD`）返回一个新字典：先保留左侧的键及其顺序，右侧新增的键按其顺序追加，重复的键取右侧的值。
 
 ### 7. 转换的补充规则
@@ -77,12 +80,14 @@ Time 不参与运算指令（`ADD`、`SUB` 等对 Time 即失败）。时长加�
 - `INT(String)` 解析失败即失败。
 - `BOOL` 不接受切片、字典、Bytes。判空用 `SIZE BOOL`。
 - `BYTES(Int)` 为 8 字节大端补码，`INT(Bytes)` 要求恰好 8 字节、按大端补码还原，两者对称。
+- `BYTE` 接受恰好 1 字节的 Bytes，与 `BYTES(Byte)` 对称。按位置从 Bytes 中读取单个字节用 `INDEX`，直接得到 Byte。
+- Bytes 与 `[]Byte` 的互转：`BYTES([]Byte)` 把成员依次复制为 Bytes；`ANYS{Byte}`（`ANYS[3]`）把 Bytes 转为 `[]Byte`。`ANYS` 的其它标识（包括 `ANYS[0]`）不接受 Bytes，需要 `[]any` 时先转为 `[]Byte`。转换的结果是切片，受成员数上限约束，超过 1024 字节的 Bytes 不能整体转为 `[]Byte`。
 - `BYTES(BigInt)` 与 `BIGINT(Bytes)` 只处理绝对值，会丢失符号。这是已知的局限，在指令说明中提示。
 - `ANYS{T}` 对每个成员按 T 的转换规则转换，任一成员不能转换即失败。
 
 ### 8. PACK
 
-**PACK 定义为「每个成员做 `BYTES` 转换，再首尾相接」**，不另设一套「基础二进制形态」，只维护一张转换表。成员不能转为 Bytes 时失败。
+**PACK 定义为「每个成员做 `BYTES` 转换，再首尾相接」**，不另设一套「基础二进制形态」，只维护一张转换表。成员不能转为 Bytes 时失败。实参也可以是 Bytes 本身，此时结果与 `BYTES(Bytes)` 相同（构想层）。
 
 PACK 的结果不带长度信息，`["ab", "c"]` 与 `["a", "bc"]` 的结果相同。用于哈希承诺时，如果成员长度可变，应先固定长度或自行加入长度字段。这一点在指令说明中提示。
 
@@ -118,6 +123,7 @@ Nil 流入后续指令时：参与算术即失败；`BOOL(Nil)` 为 false；`EQU
 - **默认失败**：类型不匹配、溢出、越界时返回一个「合理的」值，看似友好，实际是让脚本在作者没有预料的状态下继续执行。默认通关的原则下（P0-1），这类静默继续最终更可能变成放行。
 - **规则贴近 Go**：作者和多数实现者熟悉 Go，越界失败、缺键返回零值、截断除法、补码位运算都与 Go 一致，记忆成本最低。差异只在 Go 静默回绕的地方（算术溢出），这里改为失败。
 - **Float 一处拦截**：Float 有多个来源，逐个指令限制容易遗漏；在值的构造处检查，新增指令也不会漏。
+- **Bytes 与 `[]Byte` 分立**：Bytes 在限额、成本、比较、拼接、转换上的行为都与切片不同。作为切片的别名，每条切片规则都要附带「Bytes 除外」，新增规则时漏写例外就会造成实现分歧。分立之后两者各守一套规则，Bytes 只在写明的指令中代替切片，其余默认失败。有 Byte 就有 `[]Byte`，与 `[]Int` 等一致（作者）。
 - **表达式不接受 BigInt**：遵从构想层符号指令的类型定义，表达式保持为简单的 Int 运算。BigInt 的运算本来就需要按字数计成本（DEC-0007），留在命名指令里更清楚。
 
 
@@ -128,16 +134,17 @@ Nil 流入后续指令时：参与算术即失败；`BOOL(Nil)` 为 false；`EQU
 - 实现中 Float 的构造必须集中在一处。
 - 测试向量需要覆盖每一类溢出、除零、移位越界、代理区、跨类别比较。
 - 构想层 `9.运算指令.md` 中 `MOD`、`POW` 写的是「输入什么类型返回什么类型」，按第 3 条，Byte、Rune 输入的结果是 Int。
+- 值的内部表示必须区分 Bytes 与 `[]Byte`。限额与成本中，Bytes 按普通数据项处理，`[]Byte` 按切片处理，两者都不是对方的例外。
 
 
 ## 构想层依据
 
 - `conception/Instruction/1.值指令.md`：各值类型、值集的提升规则、DICT
-- `conception/Instruction/4.集合指令.md`：SLICE、EXTEND、PACK、INDEX、ITEM、SET
-- `conception/Instruction/8.转换指令.md`：转换表
+- `conception/Instruction/4.集合指令.md`：SLICE、EXTEND、PACK、INDEX、ITEM、SET；集合指令对 Bytes 的友好支持
+- `conception/Instruction/8.转换指令.md`：转换表；`Bytes` 不是 `[]Byte`；`BYTES([]Byte)`、`ANYS{Byte}`
 - `conception/Instruction/9.运算指令.md`：各运算指令支持的类型、表达式
 - `conception/Instruction/10.比较指令.md`：比较、WITHIN
-- `conception/Instruction/14.工具指令.md`：SUBSTR、MAP、COPY
+- `conception/Instruction/14.工具指令.md`：SUBSTR、MAP、COPY、SLRAND
 - 评审问答：P0-4、P1-1、P1-2、P2-5，Q5、Q9
 
 
