@@ -2,12 +2,12 @@
 
 - 状态：草案，待作者审定
 - 日期：2026-11-06
-- 修订：2026-11-08（Bytes 与 `[]Byte` 分立：`BYTE(Bytes)`、`BYTES([]Byte)`、`ANYS{Byte}` 接受 Bytes，DEC-0005 第 7 条）
+- 修订：2026-11-08（Bytes 与 `[]Byte` 分立：`BYTE(Bytes)`、`BYTES([]Byte)`、`ANYS{Byte}` 接受 Bytes，DEC-0005 第 7 条）；2026-11-11（Nil 不再转到基本类型、String、Bytes、Time；`STRING` 取消格式附参；`ANYS` 的标识改为 0、1、3–8、10）
 
 
 ## 来源追溯
 
-- `conception/Instruction/8.转换指令.md`：转换表、`STRING` 的格式标识、`ANYS`；`BYTES([]Byte)`、`ANYS{Byte}` 对 Bytes 的转换
+- `conception/Instruction/8.转换指令.md`：转换表、`STRING` 的固定格式、`ANYS`；`BYTES([]Byte)`、`ANYS{Byte}` 对 Bytes 的转换
 - `conception/Instruction/9.运算指令.md`：表达式、符号指令、命名运算指令、`DIVMOD`、`REP`、`DEL`、`CLEAR`
 - `conception/Instruction/10.比较指令.md`、`11.逻辑指令.md`
 - DEC-0001 第 2、3 条（RFC 3339、UTF-8；`strconv` / `math/big` 的行为由 Spec 定义）
@@ -30,7 +30,7 @@ Float 只在私有执行中出现。本篇写出 Float 的规则，供私有执�
 沿用 SPEC-0101 第 1 条。另：
 
 - 算术中 Byte、Rune 先提升为 Int（DEC-0005 第 3 条）。
-- 「同类型转换返回原值」〔R-24〕：`BOOL(Bool)`、`BYTE(Byte)`、`RUNE(Rune)`、`INT(Int)`、`BIGINT(BigInt)`、`FLOAT(Float)`、`STRING(String)`（附参 0）、`BYTES(Bytes)`、`RUNES([]Rune)`、`TIME(Time)`、`REGEXP(RegExp)` 都返回实参本身。构想层的转换表没有列出这些情形。
+- 「同类型转换返回原值」〔R-24〕：`BOOL(Bool)`、`BYTE(Byte)`、`RUNE(Rune)`、`INT(Int)`、`BIGINT(BigInt)`、`FLOAT(Float)`、`STRING(String)`、`BYTES(Bytes)`、`RUNES([]Rune)`、`TIME(Time)`、`REGEXP(RegExp)` 都返回实参本身。构想层的转换表没有列出这些情形。
 - 各表中没有列出的输入类型，即失败。
 
 ### 2. 转换指令 `[67-79]`
@@ -39,7 +39,6 @@ Float 只在私有执行中出现。本篇写出 Float 的规则，供私有执�
 
 | 输入 | `BOOL` | `BYTE` | `RUNE` | `INT` | `BIGINT` | `FLOAT`（私有） |
 | --- | --- | --- | --- | --- | --- | --- |
-| Nil | false | 0 | 0 | 0 | 0 | 0.0 |
 | Bool | 原值 | 0 / 1 | 0 / 1 | 0 / 1 | 0 / 1 | 0.0 / 1.0 |
 | Byte | ≠ 0 | 原值 | 同值 | 同值 | 同值 | 同值 |
 | Rune | ≠ 0 | 值 < 256 ① | 原值 | 同值 | 同值 | 同值 |
@@ -52,7 +51,7 @@ Float 只在私有执行中出现。本篇写出 Float 的规则，供私有执�
 
 ① 超出范围（或 Bytes 的长度不符）即失败。② 不超过 `0x10FFFF` 且不在 `0xD800–0xDFFF`，否则失败（DEC-0005 第 7 条）。③ NaN、±Inf，或截断后超出 int64，即失败。④ 空 Bytes 为 0；结果只能是非负数（DEC-0005 第 7 条）；绝对值达到 2¹⁰¹⁶ 即失败。
 
-- `BOOL` 不接受切片、Bytes、Dict（DEC-0005 第 7 条）。判断非空用 `SIZE BOOL`。
+- Nil 以及表中没有的类型即失败（DEC-0005 第 10 条）。`BOOL` 另外不接受切片、Bytes、Dict。判断非空用 `SIZE BOOL`。
 - `INT(Bytes)` 与 `BYTES(Int)` 互逆，`BYTE(Bytes)` 与 `BYTES(Byte)` 互逆（DEC-0005 第 7 条）。从 Bytes 中按位置读取单个字节用 `INDEX`（SPEC-0101 第 5.7 条）。
 - 成本：`K`；`INT(String)` 为 `K + B(输入字节)`；`BIGINT` 的 `D` 为结果字节数。
 
@@ -72,34 +71,31 @@ hex    = d16 { [ "_" ] d16 }
 - 下划线只能位于两个数字之间：不得在开头、末尾、紧接前缀之后，也不得连续。
 - 不接受空白、空串、只有符号或只有前缀的文本。值超出 int64 即失败（`"-9223372036854775808"` 合法）。
 
-#### 2.3 `STRING[f]`（73）
+#### 2.3 `STRING`（73）
 
-| 输入 | f = 0 | f = 2–36 | f = `b` `e` `E` `f` `g` `G` `x` `X` |
-| --- | --- | --- | --- |
-| Nil | `""` | 失败 | 失败 |
-| Bool | `"true"` / `"false"` | 失败 | 失败 |
-| Byte | 值 < 0x80 时为该字符，否则为 `\xhh` | 失败 | 失败 |
-| Rune | UTF-8 编码 | 失败 | 失败 |
-| Int、BigInt | 十进制 | f 进制 | 失败 |
-| Float（私有） | 同 `g` | 失败 | 该格式，最短表示 |
-| String | 原值 | 失败 | 失败 |
-| Bytes | 同样的字节 | 失败 | 失败 |
-| `[]Rune` | 各成员的 UTF-8 编码首尾相接 | 失败 | 失败 |
+没有附参。格式由实参类型决定（构想层，DEC-0001 第 3 条）〔R-24〕：
 
-〔R-24〕的细节：
+| 输入 | 结果 |
+| --- | --- |
+| Bool | `"True"` / `"False"` |
+| Byte | 含该字节的一字节字符串，不转义、不检查 UTF-8 |
+| Rune | 该码点的 UTF-8 |
+| Int | 十进制：负号在前，没有前导零，0 为 `"0"` |
+| BigInt | `0x` 加十六进制，数位大写，没有前导零；负数写作 `-0x…`；0 为 `"0x0"` |
+| Float（私有） | `strconv.FormatFloat(x, 'g', -1, 64)` |
+| String | 原值 |
+| Bytes | 同样的字节，视为 UTF-8 但不检查、不替换 |
+| `[]Rune` | 各成员的 UTF-8 编码首尾相接 |
 
-- 进制输出使用 `0-9` 与小写 `a-z`，负数前加 `-`，没有前缀与前导零，0 为 `"0"`（DEC-0001 第 3 条）。
-- Byte 的 `\xhh` 是 4 个字符，h 为小写十六进制。合法字符的判断按 UTF-8：单个字节只有小于 0x80 才是一个完整的字符（DEC-0001 第 3 条：不使用「可打印」判断）。
-- Rune：运行时的 Rune 总是合法的标量值（SPEC-0004 第 2 条），所以构想层的 `\uhhhh` 形式不会出现。
-- Float 的格式按 Go `strconv.FormatFloat(x, f, -1, 64)`（私有执行，参考实现）。
-- 结果不检查 UTF-8 合法性（构想层）。
+- `STRING(Bool)` 与 `BOOL(String)` 不互逆：`BOOL` 只把空字符串当作 false，`"False"` 与 `"True"` 都是 true。
+- 运行时的 Rune 总是合法的标量值（SPEC-0004 第 2 条）。
+- Nil 与其它类型即失败。
 - 成本：`K`，`D` 为结果字节数。
 
 #### 2.4 `BYTES`（74）
 
 | 输入 | 结果 |
 | --- | --- |
-| Nil | 空 Bytes |
 | Bool | `0x00` / `0x01` |
 | Byte | 1 字节 |
 | Rune | UTF-8 编码（1–4 字节） |
@@ -144,7 +140,6 @@ Float、Dict、其它切片、模块对象即失败。
 
 | 输入 | 结果 |
 | --- | --- |
-| Nil | 时刻 0，偏移 0（`1970-01-01T00:00:00Z`） |
 | Byte、Rune、Int | 时刻为该值（毫秒），偏移 0 |
 | String | 按 2.8 解析；偏移取文本中的偏移〔R-05〕 |
 | Time | 原值 |
@@ -176,17 +171,19 @@ date-time = 年 "-" 月 "-" 日 ( "T" | "t" ) 时 ":" 分 ":" 秒 [ "." 1*DIGIT 
 | k | 实参 | 结果 |
 | --- | --- | --- |
 | 0 | Nil 或任一切片 | `[]any`，成员不变；Nil 得到空的 `[]any` |
-| 1、2 | Nil 或 `[]any` | `[]Bool`，每个成员按 `BOOL` 转换 |
+| 1 | Nil 或 `[]any` | `[]Bool`，每个成员按 `BOOL` 转换 |
 | 3 | 同上，或 Bytes | `[]Byte`：`[]any` 的每个成员按 `BYTE` 转换；Bytes 的每个字节成为一个成员 |
 | 4 | 同上 | `[]Rune`，按 `RUNE` |
 | 5 | 同上 | `[]Int`，按 `INT` |
 | 6 | 同上 | `[]BigInt`，按 `BIGINT` |
 | 7 | 同上 | `[]Float`，按 `FLOAT`。公共执行中即失败，即使为空〔R-06〕 |
-| 8 | 同上 | `[]String`，按 `STRING`（附参 0） |
+| 8 | 同上 | `[]String`，按 `STRING` |
+| 10 | Nil 或 `[]any` | `[]Bytes`，每个成员按 `BYTES` 转换 |
 
+- 标识就是该类型值指令的码值，0 除外（构想层）。因此 Bool 用 `TRUE` 的码值 1，不用 `FALSE` 的码值 2。k 不在上表中（包括 2 与 9）即未分配，加载失败（SPEC-0002、SPEC-0007 第 4 条）。
 - k ≥ 1 时，实参是 Nil 得到该类型的空切片；实参是 `[]any` 以外的切片即失败（构想层只列了 `NIL|[]any`）。
 - 只有 k = 3 接受 Bytes（构想层 `DATA{...} ANYS{Byte}`）；其它 k，包括 0，遇到 Bytes 即失败（DEC-0005 第 7 条）。需要成员为 Byte 的 `[]any` 时，先 `ANYS{Byte}` 再 `ANYS[0]`。结果是切片，Bytes 超过 1024 字节即失败（SPEC-0006 第 1 条）。
-- 任一成员不能转换即失败（DEC-0005 第 7 条）。例：`{0} NIL TRUE SHIFT[3] ANYS{Bool}` 得到 `[false, false, true]`（构想层）。
+- 任一成员不能转换即失败（DEC-0005 第 7 条）。例：`{0} {0.0} TRUE SHIFT[3] ANYS{Bool}` 得到 `[false, false, true]`（构想层；其中 `{0.0}` 只在私有执行中成立）。
 - 成本：`K + m`，`D` 为结果中新产生的 String、BigInt 等的字节数。
 
 ### 3. 运算指令 `[80-103]`
@@ -300,7 +297,7 @@ date-time = 年 "-" 月 "-" 日 ( "T" | "t" ) 时 ":" 分 ":" 秒 [ "." 1*DIGIT 
 ## 待决问题
 
 - P-02：成本系数。
-- 本篇新增的细则：R-24、R-25、R-26（待作者确认，见 SPEC-0001 第 6.3 条）。
+- R-24、R-25、R-26 已确认（SPEC-0001 第 6.3 条）。
 
 
 ## 对 Plan 的约束
