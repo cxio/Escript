@@ -32,11 +32,11 @@
 | SPEC-0102 | `SPEC-0102-conversion-arithmetic.md` | 转换（含 `INT` / `TIME` 的文本文法、UTF-8 解码）、运算、比较、逻辑指令 |
 | SPEC-0103 | `SPEC-0103-model-matching.md` | MODEL：目标解码、模式单元、深匹配、`^?` 的部分编码、类型标识表、范围与正则、求解与回溯、取值、成本 |
 | SPEC-0104 | `SPEC-0104-environment-tools-functions.md` | 正则约定与全部匹配算法；环境（含 `SOURCE`）、工具（`MATCH`、`REPLACE`、`RANDOM`、`CALL` 等）、系统、函数（编码与哈希）指令 |
-| SPEC-0105 | `SPEC-0105-module-methods.md` | 模块与扩展：调用方式、v1 方法表（`MO_TIME`、`MO_RE`、`MO_BINT`、`MO_MATH`、`MO_FMT`、Dict 的 `CALL` 方法；评审者起草，作者审定） |
+| SPEC-0105 | `SPEC-0105-module-methods.md` | 模块与扩展：调用方式、v1 方法表（`MO_TIME`、`MO_RE`、`MO_BINT`、`MO_MATH`、`MO_FMT`、Dict 的 `CALL` 方法） |
 | SPEC-0106 | `SPEC-0106-private-execution.md` | 私有执行：Float、私有通道、`SYS_TIME`、`SHELL`、`FN_PRIV` / `EXT_PRIV`、值的默认文本形式 |
-| SPEC-0201 | （待编写） | 文本语法（编译 / 反编译）与 EBNF |
-| SPEC-0202 | （待编写） | 测试向量格式 |
-| SPEC-0901 | （待编写） | Evidcoin 宿主规格 |
+| SPEC-0201 | `SPEC-0201-text-syntax.md` | 文本语法：注释、词法、字面量、附参与别名、块与表达式、模式文本、规范反编译 |
+| SPEC-0202 | `SPEC-0202-test-vectors.md` | 测试向量的 JSON 格式、环境夹具、成本断言 |
+| SPEC-0901 | `SPEC-0901-evidcoin-host.md` | Evidcoin 宿主：预发布、字段与见证、签名消息、地址、`SYS_CHKPASS`、创建时检查 |
 
 
 **维护规则：**
