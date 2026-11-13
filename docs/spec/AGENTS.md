@@ -34,7 +34,7 @@
 | SPEC-0104 | `SPEC-0104-environment-tools-functions.md` | 正则约定与全部匹配算法；环境（含 `SOURCE`）、工具（`MATCH`、`REPLACE`、`RANDOM`、`CALL` 等）、系统、函数（编码与哈希）指令 |
 | SPEC-0105 | `SPEC-0105-module-methods.md` | 模块与扩展：调用方式、v1 方法表（`MO_TIME`、`MO_RE`、`MO_BINT`、`MO_MATH`、`MO_FMT`、Dict 的 `CALL` 方法） |
 | SPEC-0106 | `SPEC-0106-private-execution.md` | 私有执行：Float、私有通道、`SYS_TIME`、`SHELL`、`FN_PRIV` / `EXT_PRIV`、值的默认文本形式 |
-| SPEC-0201 | `SPEC-0201-text-syntax.md` | 文本语法：注释、词法、字面量、附参与别名、块与表达式、模式文本、规范反编译 |
+| SPEC-0201 | `SPEC-0201-text-syntax.md` | 文本语法：注释、词法、字面量、附参与别名、块与表达式、模式文本、规范反编译、EBNF |
 | SPEC-0202 | `SPEC-0202-test-vectors.md` | 测试向量的 JSON 格式、环境夹具、成本断言 |
 | SPEC-0901 | `SPEC-0901-evidcoin-host.md` | Evidcoin 宿主：预发布、字段与见证、签名消息、地址、`SYS_CHKPASS`、创建时检查 |
 

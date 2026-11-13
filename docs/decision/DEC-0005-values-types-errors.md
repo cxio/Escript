@@ -2,7 +2,7 @@
 
 - 状态：Accepted
 - 日期：2026-10-28
-- 修订：2026-11-01（并入作者回答：Time 的运算由 `MO_TIME` 提供）；2026-11-06（开放问题 1 关闭：BigInt 的取模与幂由 `MO_BINT` 提供）；2026-11-08（作者决定：Bytes 与 `[]Byte` 是两个类型，取消别名；第 1、5、6、7、8 条相应修订）；2026-11-11（Nil 不再转到基本类型、String、Bytes、Time）
+- 修订：2026-11-01（并入作者回答：Time 的运算由 `MO_TIME` 提供）；2026-11-06（开放问题 1 关闭：BigInt 的取模与幂由 `MO_BINT` 提供）；2026-11-08（作者决定：Bytes 与 `[]Byte` 是两个类型，取消别名；第 1、5、6、7、8 条相应修订）；2026-11-11（Nil 不再转到基本类型、String、Bytes、Time）；2026-11-13（第 5 条：Nil 与不可比较的类型做相等比较为「不相等」而不是失败，与构想层 `10.比较指令.md` 对齐）
 - 覆盖评审条目：P0-4、P1-1、P1-2、P2-5（Q5、Q9）
 
 
@@ -57,7 +57,7 @@ Nil、Bool、Byte、Rune、Int（int64）、BigInt（绝对值不超过 1016 位
 
 ### 5. 比较
 
-- `EQUAL` / `NEQUAL`：数值类先提升再按值比较（Byte 65 等于 Int 65，Int 与值相同的 BigInt 相等）；String 与 String、Bytes 与 Bytes、Script 与 Script 按字节比较；Time 按时刻比较；Bool 与 Bool 比较；Nil 只等于 Nil。两边类别不同时结果为「不相等」，不失败。切片（包括 `[]Byte`）、字典、RegExp、模块 / 对象不可比较，比较即失败；因此 Bytes 与 `[]Byte` 比较是失败，而不是「不相等」。
+- `EQUAL` / `NEQUAL`：数值类先提升再按值比较（Byte 65 等于 Int 65，Int 与值相同的 BigInt 相等）；String 与 String、Bytes 与 Bytes、Script 与 Script 按字节比较；Time 按时刻比较；Bool 与 Bool 比较；Nil 只等于 Nil。两边类别不同时结果为「不相等」，不失败。切片（包括 `[]Byte`）、字典、RegExp、模块 / 对象不可比较，比较即失败；因此 Bytes 与 `[]Byte` 比较是失败，而不是「不相等」。例外：一边是 Nil 时，相等比较不失败，Nil 与任何非 Nil 的值（包括不可比较的类型）都为「不相等」。
 - `LT` / `LTE` / `GT` / `GTE`：只用于数值、String、Bytes、Time，且两边类别相同，否则失败。String 与 Bytes 按字节从左到右比较。
 - `WITHIN`：只用于数值，按构想层的类型清单。
 - 私有域的 Float 按 IEEE 754 比较，NaN 不等于任何值。

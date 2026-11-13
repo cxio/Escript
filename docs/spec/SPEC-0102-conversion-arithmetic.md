@@ -2,7 +2,7 @@
 
 - 状态：草案，待作者审定
 - 日期：2026-11-06
-- 修订：2026-11-08（Bytes 与 `[]Byte` 分立：`BYTE(Bytes)`、`BYTES([]Byte)`、`ANYS{Byte}` 接受 Bytes，DEC-0005 第 7 条）；2026-11-11（Nil 不再转到基本类型、String、Bytes、Time；`STRING` 取消格式附参；`ANYS` 的标识改为 0、1、3–8、10）
+- 修订：2026-11-08（Bytes 与 `[]Byte` 分立：`BYTE(Bytes)`、`BYTES([]Byte)`、`ANYS{Byte}` 接受 Bytes，DEC-0005 第 7 条）；2026-11-11（Nil 不再转到基本类型、String、Bytes、Time；`STRING` 取消格式附参；`ANYS` 的标识改为 0、1、3–8、10）；2026-11-13（第 4 条：一边是 Nil 时相等比较不失败）
 
 
 ## 来源追溯
@@ -263,7 +263,7 @@ date-time = 年 "-" 月 "-" 日 ( "T" | "t" ) 时 ":" 分 ":" 秒 [ "." 1*DIGIT 
 
 ### 4. 比较指令 `[104-111]`
 
-**`EQUAL`、`NEQUAL`、`LT`、`LTE`、`GT`、`GTE`**：按 SPEC-0004 第 5 条的类别表比较，返回 Bool。两边类别不同时 `EQUAL` 为 false、`NEQUAL` 为 true；大小比较的两边类别不同，或类别不支持大小比较（Bool、Nil、Script），即失败；不可比较的类型即失败。成本：`K`。
+**`EQUAL`、`NEQUAL`、`LT`、`LTE`、`GT`、`GTE`**：按 SPEC-0004 第 5 条的类别表比较，返回 Bool。两边类别不同时 `EQUAL` 为 false、`NEQUAL` 为 true；大小比较的两边类别不同，或类别不支持大小比较（Bool、Nil、Script），即失败；不可比较的类型即失败，但一边是 Nil 时的相等比较除外（Nil 只等于 Nil，与任何其它值都不相等）。成本：`K`。
 
 **`ISEFV[k]`（110）**：实参为 Float 时，k = 0 判断 NaN，k = 1 判断 +Inf，k = 2 判断 −Inf；实参为其它任何类型时返回 false，不失败。成本：`K`。
 
