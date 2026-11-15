@@ -2,7 +2,7 @@
 
 - 状态：Accepted
 - 日期：2026-10-28
-- 修订：2026-11-01（并入作者回答：Time 的运算由 `MO_TIME` 提供）；2026-11-06（开放问题 1 关闭：BigInt 的取模与幂由 `MO_BINT` 提供）；2026-11-08（作者决定：Bytes 与 `[]Byte` 是两个类型，取消别名；第 1、5、6、7、8 条相应修订）；2026-11-11（Nil 不再转到基本类型、String、Bytes、Time）；2026-11-13（第 5 条：Nil 与不可比较的类型做相等比较为「不相等」而不是失败，与构想层 `10.比较指令.md` 对齐）
+- 修订：2026-11-01（并入作者回答：Time 的运算由 `MO_TIME` 提供）；2026-11-06（开放问题 1 关闭：BigInt 的取模与幂由 `MO_BINT` 提供）；2026-11-08（作者决定：Bytes 与 `[]Byte` 是两个类型，取消别名；第 1、5、6、7、8 条相应修订）；2026-11-11（Nil 不再转到基本类型、String、Bytes、Time）；2026-11-13（第 5 条：Nil 与不可比较的类型做相等比较为「不相等」而不是失败，与构想层 `10.比较指令.md` 对齐）；2026-11-15（第 8、10 条：PACK 忽略切片中的 Nil 成员；第 7、8 条：`BYTES(Float)` 为 IEEE 754 原始位的大端 8 字节，以及 `FLOAT(Bytes)` 的逆运算）
 - 覆盖评审条目：P0-4、P1-1、P1-2、P2-5（Q5、Q9）
 
 
@@ -83,11 +83,16 @@ Time 不参与运算指令（`ADD`、`SUB` 等对 Time 即失败）。时长加�
 - `BYTE` 接受恰好 1 字节的 Bytes，与 `BYTES(Byte)` 对称。按位置从 Bytes 中读取单个字节用 `INDEX`，直接得到 Byte。
 - Bytes 与 `[]Byte` 的互转：`BYTES([]Byte)` 把成员依次复制为 Bytes；`ANYS{Byte}`（`ANYS[3]`）把 Bytes 转为 `[]Byte`。`ANYS` 的其它标识（包括 `ANYS[0]`）不接受 Bytes，需要 `[]any` 时先转为 `[]Byte`。转换的结果是切片，受成员数上限约束，超过 1024 字节的 Bytes 不能整体转为 `[]Byte`。
 - `BYTES(BigInt)` 与 `BIGINT(Bytes)` 只处理绝对值，会丢失符号。这是已知的局限，在指令说明中提示。
+- `BYTES(Float)` 取该值的 IEEE 754 binary64 原始位（`math.Float64bits`），按大端序写成固定 8 字节，与浮点字面量的 `f64be` 相同。+0、−0、NaN 的载荷和 ±Inf 都按原位写出。这是位模式搬运，不是浮点运算，结果是 Bytes。`FLOAT(Bytes)` 是它的逆运算，实参必须恰好是 8 字节，按大端序读成 uint64，再用 `math.Float64frombits` 还原。
 - `ANYS{T}` 对每个成员按 T 的转换规则转换，任一成员不能转换即失败。
 
 ### 8. PACK
 
-**PACK 定义为「每个成员做 `BYTES` 转换，再首尾相接」**，不另设一套「基础二进制形态」，只维护一张转换表。成员不能转为 Bytes 时失败。实参也可以是 Bytes 本身，此时结果与 `BYTES(Bytes)` 相同（构想层）。
+**PACK 定义为「每个成员做 `BYTES` 转换，再首尾相接」**，不另设一套「基础二进制形态」，只维护一张转换表。实参为切片时，按直接成员的实际类型转换：取该成员的实际类型，再查 `BYTES` 表。
+
+值为 Nil 的直接成员忽略，无转换操作。切片为空，或成员全部被忽略时，结果为空 Bytes。成员不能转为 Bytes 时失败。Nil 忽略只属于 `PACK`，发生在转换之前。
+
+实参也可以是 Bytes 本身，此时结果与 `BYTES(Bytes)` 相同（构想层）。
 
 PACK 的结果不带长度信息，`["ab", "c"]` 与 `["a", "bc"]` 的结果相同。用于哈希承诺时，如果成员长度可变，应先固定长度或自行加入长度字段。这一点在指令说明中提示。
 
@@ -103,9 +108,9 @@ PACK 的结果不带长度信息，`["ab", "c"]` 与 `["a", "bc"]` 的结果相�
 | --- | --- | --- |
 | 按位置访问 | 越界即失败（同 Go 的切片越界） | `SLICE`、`INDEX`、`POPS`、`TOPS`、`PEEK`、`PEEKS`、`SHIFT`、`CLONE`、`VIEW`、`&[n]` |
 | 按键查找 | 缺失返回 Nil（同 Go 从 map 取不存在的键） | `ITEM` |
-| 明确声明的宽松行为 | 按指令说明 | `SUBSTR` 返回已截取的部分；MODEL 内 `$[n]` 越界返回 Nil；`MAP` 丢弃 Nil 结果 |
+| 明确声明的宽松行为 | 按指令说明 | `SUBSTR` 返回已截取的部分；MODEL 内 `$[n]` 越界返回 Nil；`MAP` 丢弃 Nil 结果；`PACK` 忽略切片中的 Nil 成员 |
 
-Nil 流入后续指令时：参与算术即失败；转到基本类型、String、Bytes、Time 即失败（`RUNES(Nil)` 与 `ANYS(Nil)` 仍得到空切片，构想层 `8.转换指令.md`）；Nil 只支持 `EQUAL/NEQUAL` 比较。
+Nil 流入后续指令时：参与算术即失败；转到基本类型、String、Bytes、Time 即失败（`RUNES(Nil)` 与 `ANYS(Nil)` 仍得到空切片，构想层 `8.转换指令.md`；`PACK` 忽略切片中的 Nil 成员，第 8 条）；Nil 只支持 `EQUAL/NEQUAL` 比较。
 
 ### 11. 值语义
 
@@ -125,6 +130,8 @@ Nil 流入后续指令时：参与算术即失败；转到基本类型、String�
 - **Float 一处拦截**：Float 有多个来源，逐个指令限制容易遗漏；在值的构造处检查，新增指令也不会漏。
 - **Bytes 与 `[]Byte` 分立**：Bytes 在限额、成本、比较、拼接、转换上的行为都与切片不同。作为切片的别名，每条切片规则都要附带「Bytes 除外」，新增规则时漏写例外就会造成实现分歧。分立之后两者各守一套规则，Bytes 只在写明的指令中代替切片，其余默认失败。有 Byte 就有 `[]Byte`，与 `[]Int` 等一致（作者）。
 - **表达式不接受 BigInt**：遵从构想层符号指令的类型定义，表达式保持为简单的 Int 运算。BigInt 的运算本来就需要按字数计成本（DEC-0007），留在命名指令里更清楚。
+- **PACK 在转换之前忽略 Nil**：构想层已写明切片中的 Nil 成员直接忽略。忽略留在 `PACK` 内、发生在查表之前，因此仍然只有一张 `BYTES` 表，Nil 没有字节编码。
+- **浮点与 Bytes 只搬位**：构想层用 `math.Float64bits` 与 `math.Float64frombits` 的大端 8 字节，两个方向逐位互逆。给定同一个位模式，各平台的结果相同；跨平台差异只可能来自产生该 Float 的运算，不来自这两次转换。
 
 
 ## 影响
@@ -133,6 +140,8 @@ Nil 流入后续指令时：参与算术即失败；转到基本类型、String�
 - 每条指令的 Spec 条目增加「异常」一行。
 - 实现中 Float 的构造必须集中在一处。
 - 测试向量需要覆盖每一类溢出、除零、移位越界、代理区、跨类别比较。
+- `PACK` 跳过切片中值为 Nil 的直接成员；空切片与成员全部被忽略时结果为空 Bytes。测试向量覆盖 Nil 在首、中、尾，全部为 Nil，以及 Nil 与不能转换的成员同时存在。
+- `BYTES(Float)` 与 `FLOAT(Bytes)` 逐位互逆。测试向量覆盖往返（+0、−0、一个有限值、±Inf、载荷不被清掉的 NaN），以及长度不是 8 字节时 `FLOAT(Bytes)` 失败。含浮点数成员的 `PACK`、`ANYS{Bytes}` 使用同一编码。公共域执行中 `FLOAT(Bytes)` 因产生 Float 而失败。
 - 构想层 `9.运算指令.md` 中 `MOD`、`POW` 写的是「输入什么类型返回什么类型」，按第 3 条，Byte、Rune 输入的结果是 Int。
 - 值的内部表示必须区分 Bytes 与 `[]Byte`。限额与成本中，Bytes 按普通数据项处理，`[]Byte` 按切片处理，两者都不是对方的例外。
 
@@ -141,7 +150,7 @@ Nil 流入后续指令时：参与算术即失败；转到基本类型、String�
 
 - `conception/Instruction/1.值指令.md`：各值类型、值集的提升规则、DICT
 - `conception/Instruction/4.集合指令.md`：SLICE、EXTEND、PACK、INDEX、ITEM、SET；集合指令对 Bytes 的友好支持
-- `conception/Instruction/8.转换指令.md`：转换表；`Bytes` 不是 `[]Byte`；`BYTES([]Byte)`、`ANYS{Byte}`
+- `conception/Instruction/8.转换指令.md`：转换表；`Bytes` 不是 `[]Byte`；`BYTES([]Byte)`、`ANYS{Byte}`；`BYTES(Float)`、`FLOAT(Bytes)`
 - `conception/Instruction/9.运算指令.md`：各运算指令支持的类型、表达式
 - `conception/Instruction/10.比较指令.md`：比较、WITHIN
 - `conception/Instruction/14.工具指令.md`：SUBSTR、MAP、COPY、SLRAND

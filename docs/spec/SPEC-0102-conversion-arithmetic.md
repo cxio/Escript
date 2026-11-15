@@ -2,16 +2,16 @@
 
 - 状态：草案，待作者审定
 - 日期：2026-11-06
-- 修订：2026-11-08（Bytes 与 `[]Byte` 分立：`BYTE(Bytes)`、`BYTES([]Byte)`、`ANYS{Byte}` 接受 Bytes，DEC-0005 第 7 条）；2026-11-11（Nil 不再转到基本类型、String、Bytes、Time；`STRING` 取消格式附参；`ANYS` 的标识改为 0、1、3–8、10）；2026-11-13（第 4 条：一边是 Nil 时相等比较不失败）
+- 修订：2026-11-08（Bytes 与 `[]Byte` 分立：`BYTE(Bytes)`、`BYTES([]Byte)`、`ANYS{Byte}` 接受 Bytes，DEC-0005 第 7 条）；2026-11-11（Nil 不再转到基本类型、String、Bytes、Time；`STRING` 取消格式附参；`ANYS` 的标识改为 0、1、3–8、10）；2026-11-13（第 4 条：一边是 Nil 时相等比较不失败）；2026-11-15（第 2.4 条：写明 `PACK` 对 Nil 成员的忽略不改变 `BYTES`；`BYTES(Float)` 为 IEEE 754 原始位的大端 8 字节；第 2.1 条：`FLOAT(Bytes)` 为上述编码的逆运算）
 
 
 ## 来源追溯
 
-- `conception/Instruction/8.转换指令.md`：转换表、`STRING` 的固定格式、`ANYS`；`BYTES([]Byte)`、`ANYS{Byte}` 对 Bytes 的转换
+- `conception/Instruction/8.转换指令.md`：转换表、`STRING` 的固定格式、`ANYS`；`BYTES([]Byte)`、`ANYS{Byte}` 对 Bytes 的转换；`BYTES(Float)`、`FLOAT(Bytes)`
 - `conception/Instruction/9.运算指令.md`：表达式、符号指令、命名运算指令、`DIVMOD`、`REP`、`DEL`、`CLEAR`
 - `conception/Instruction/10.比较指令.md`、`11.逻辑指令.md`
 - DEC-0001 第 2、3 条（RFC 3339、UTF-8；`strconv` / `math/big` 的行为由 Spec 定义）
-- DEC-0005 第 1–7、10 条（Bytes 与 `[]Byte`、Float、提升、溢出、比较、拼接与合并、转换的补充规则）
+- DEC-0005 第 1–8、10 条（Bytes 与 `[]Byte`、Float、提升、溢出、比较、拼接与合并、转换的补充规则、PACK 对 Nil 成员的忽略）
 - DEC-0006 第 10 条（表达式的求值）
 - SPEC-0004（值模型）、SPEC-0005 第 8 条（表达式）、SPEC-0101 第 1 条（通用约定）
 
@@ -46,13 +46,14 @@ Float 只在私有执行中出现。本篇写出 Float 的规则，供私有执�
 | BigInt | ≠ 0 | 0–255 ① | 合法码点 ② | int64 范围 ① | 原值 | 失败 |
 | Float | ≠ 0，NaN 为 true | 失败 | 失败 | 向零截断 ③ | 失败 | 原值 |
 | String | ≠ "" | 失败 | 失败 | 文本解析（2.2） | 失败 | 文本解析（SPEC-0106 第 2 条） |
-| Bytes | 失败 | 恰好 1 字节，取该字节 ① | 失败 | 恰好 8 字节，大端二进制补码 ① | 大端无符号 ④ | 失败 |
+| Bytes | 失败 | 恰好 1 字节，取该字节 ① | 失败 | 恰好 8 字节，大端二进制补码 ① | 大端无符号 ④ | 恰好 8 字节，大端 binary64 ① |
 | Time | 失败 | 失败 | 失败 | 毫秒时刻 | 失败 | 失败 |
 
 ① 超出范围（或 Bytes 的长度不符）即失败。② 不超过 `0x10FFFF` 且不在 `0xD800–0xDFFF`，否则失败（DEC-0005 第 7 条）。③ NaN、±Inf，或截断后超出 int64，即失败。④ 空 Bytes 为 0；结果只能是非负数（DEC-0005 第 7 条）；绝对值达到 2¹⁰¹⁶ 即失败。
 
 - Nil 以及表中没有的类型即失败（DEC-0005 第 10 条）。`BOOL` 另外不接受切片、Bytes、Dict。判断非空用 `SIZE BOOL`。
 - `INT(Bytes)` 与 `BYTES(Int)` 互逆，`BYTE(Bytes)` 与 `BYTES(Byte)` 互逆（DEC-0005 第 7 条）。从 Bytes 中按位置读取单个字节用 `INDEX`（SPEC-0101 第 5.7 条）。
+- `FLOAT(Bytes)` 与 `BYTES(Float)` 互逆（DEC-0005 第 7 条）：实参是恰好 8 字节的 Bytes，按大端序组成 uint64，以 `math.Float64frombits` 还原。任意位模式都成功，包括 −0、±Inf 与 NaN 载荷。长度不是 8 即失败。实参是 Bytes，不是 `[]Byte`。结果是 Float，公共执行中即失败（本列「私有」，SPEC-0004 第 3 条）；私有执行中成功。
 - 成本：`K`；`INT(String)` 为 `K + B(输入字节)`；`BIGINT` 的 `D` 为结果字节数。
 
 #### 2.2 `INT(String)` 的文法〔R-24〕
@@ -101,6 +102,7 @@ hex    = d16 { [ "_" ] d16 }
 | Rune | UTF-8 编码（1–4 字节） |
 | Int | 8 字节，大端二进制补码 |
 | BigInt | 绝对值的大端字节，最少字节数；0 为空。符号丢失（DEC-0005 第 7 条） |
+| Float | 8 字节。`math.Float64bits` 得到的 uint64，大端序，与浮点字面量的 `f64be` 相同（R-02，DEC-0005 第 7 条） |
 | String | 同样的字节，不检查 UTF-8 |
 | Bytes | 原值 |
 | `[]Byte` | 各成员依次组成的字节序列（构想层） |
@@ -109,7 +111,9 @@ hex    = d16 { [ "_" ] d16 }
 | Time | 毫秒时刻的 `varint` 编码（SPEC-0002 第 2.1 条），与 `DATE` 的数据相同 |
 | RegExp | 源文本的字节 |
 
-Float、Dict、其它切片、模块对象即失败。
+Dict、其它切片、模块对象即失败。Nil 以及表中没有的类型即失败。`PACK` 在查本表之前忽略切片里值为 Nil 的直接成员（SPEC-0101 第 5.5 条，DEC-0005 第 8 条）。
+
+`BYTES(Float)` 写出该值已有的 binary64 位：符号、阶码、尾数原样进入 8 字节。+0 为 `00 00 00 00 00 00 00 00`，−0 为 `80 00 00 00 00 00 00 00`，1.0 为 `3F F0 00 00 00 00 00 00`。±Inf 与 NaN 都成功，NaN 的载荷保持原样。结果是 Bytes，这次转换不产生 Float。`FLOAT(Bytes)` 按同一位模式还原（第 2.1 条）。实参为 Float 只出现在私有执行中（SPEC-0004 第 3 条）；给定同一个 Float，各平台的字节相同（SPEC-0106 第 2 条）。
 
 `BYTES(Script)` 按源码类检查，是因为 Script 本身可以达到 16KB（`CODE`、`SCRIPT`），按普通数据项的 8KB 检查会使较大的 Script 无法转换。
 
@@ -303,6 +307,7 @@ date-time = 年 "-" 月 "-" 日 ( "T" | "t" ) 时 ":" 分 ":" 秒 [ "." 1*DIGIT 
 ## 对 Plan 的约束
 
 - 第 2、3 条的表就是 DEC-0005「运算 × 类型」矩阵，实现为表驱动；测试向量覆盖每个单元格，包括「失败」的单元格。
+- `BYTES(Float)` 与 `FLOAT(Bytes)` 用 +0、−0、1.0、±Inf 和一条载荷非零的 NaN 验证往返字节（第 2.1、2.4 条）。长度不是 8 时 `FLOAT(Bytes)` 失败。`ANYS{Bytes}` 对含 Float 的 `[]any`、`ANYS{Float}` 对成员为 8 字节 Bytes 的 `[]any`，都按同一编码逐项转换（后者只在私有执行中成功）。
 - `INT(String)`、`TIME(String)` 的解析器必须按本篇的文法自行实现，不得直接使用 `strconv.ParseInt(s, 0, 64)`（前导零与下划线的规则不同）或 `time.Parse`（接受的形式不同）。
 - UTF-8 解码按第 2.6 条实现，用含代理区编码、超长编码、截断序列、`0x10FFFF` 以上编码的向量验证。
 - 溢出、除零、移位越界、代理区、BigInt 边界（2¹⁰¹⁶）各要有向量（DEC-0005 影响）。
