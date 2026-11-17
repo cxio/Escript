@@ -7,7 +7,7 @@
 
 ## 来源追溯
 
-- `conception/Design.md`、`conception/Instruction/*`：全部构想
+- `conception/Design.md`、`conception/[0-18].*`：全部构想
 - DEC-0001 规格权威与外部算法
 - DEC-0002 核心 VM 与宿主接口
 - DEC-0003 ～ DEC-0007：DEC-0003 由 SPEC-0002、0003 展开，DEC-0005 由 SPEC-0004 展开，DEC-0006 由 SPEC-0005 展开，DEC-0007 由 SPEC-0006 展开，DEC-0004 由 SPEC-0007 展开；DEC-0002 由 SPEC-0008 展开

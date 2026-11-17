@@ -95,10 +95,10 @@
 ## 构想层依据
 
 - `conception/Design.md`：数据栈（`[]any`）
-- `conception/Instruction/1.值指令.md`：正则表达式（RE2）、`DATE{}`（RFC 3339）
-- `conception/Instruction/14.工具指令.md`：`RANDOM`、`SLRAND` 的算法；`CALL`
-- `conception/Instruction/16.函数指令.md`：`FN_HASH*` 算法标识、`FN_BASE32` / `FN_BASE64` 规范
-- `conception/Instruction/17.模块指令.md`：`MO_FMT`、`MO_TIME`
+- `conception/1.值指令.md`：正则表达式（RE2）、`DATE{}`（RFC 3339）
+- `conception/14.工具指令.md`：`RANDOM`、`SLRAND` 的算法；`CALL`
+- `conception/16.函数指令.md`：`FN_HASH*` 算法标识、`FN_BASE32` / `FN_BASE64` 规范
+- `conception/17.模块指令.md`：`MO_FMT`、`MO_TIME`
 - 评审问答：P0-5，Q10、Q11
 
 

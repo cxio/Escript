@@ -148,12 +148,12 @@ Nil 流入后续指令时：参与算术即失败；转到基本类型、String�
 
 ## 构想层依据
 
-- `conception/Instruction/1.值指令.md`：各值类型、值集的提升规则、DICT
-- `conception/Instruction/4.集合指令.md`：SLICE、EXTEND、PACK、INDEX、ITEM、SET；集合指令对 Bytes 的友好支持
-- `conception/Instruction/8.转换指令.md`：转换表；`Bytes` 不是 `[]Byte`；`BYTES([]Byte)`、`ANYS{Byte}`；`BYTES(Float)`、`FLOAT(Bytes)`
-- `conception/Instruction/9.运算指令.md`：各运算指令支持的类型、表达式
-- `conception/Instruction/10.比较指令.md`：比较、WITHIN
-- `conception/Instruction/14.工具指令.md`：SUBSTR、MAP、COPY、SLRAND
+- `conception/1.值指令.md`：各值类型、值集的提升规则、DICT
+- `conception/4.集合指令.md`：SLICE、EXTEND、PACK、INDEX、ITEM、SET；集合指令对 Bytes 的友好支持
+- `conception/8.转换指令.md`：转换表；`Bytes` 不是 `[]Byte`；`BYTES([]Byte)`、`ANYS{Byte}`；`BYTES(Float)`、`FLOAT(Bytes)`
+- `conception/9.运算指令.md`：各运算指令支持的类型、表达式
+- `conception/10.比较指令.md`：比较、WITHIN
+- `conception/14.工具指令.md`：SUBSTR、MAP、COPY、SLRAND
 - 评审问答：P0-4、P1-1、P1-2、P2-5，Q5、Q9
 
 

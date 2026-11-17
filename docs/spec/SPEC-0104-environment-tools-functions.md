@@ -7,9 +7,9 @@
 
 ## 来源追溯
 
-- `conception/Instruction/13.环境指令.md`：域的层次、`ENV` ～ `SOURCE`、NULL 点的示例
-- `conception/Instruction/14.工具指令.md`：`EVAL` ～ `SHELL`，`RANDOM` / `SLRAND` 的算法
-- `conception/Instruction/15.系统指令.md`、`16.函数指令.md`
+- `conception/13.环境指令.md`：域的层次、`ENV` ～ `SOURCE`、NULL 点的示例
+- `conception/14.工具指令.md`：`EVAL` ～ `SHELL`，`RANDOM` / `SLRAND` 的算法
+- `conception/15.系统指令.md`、`16.函数指令.md`
 - DEC-0002 第 1、2 条（环境字段与签名属于宿主；授权标识）、第 6 条（`SHELL` 的双保险与来源输出）
 - DEC-0005 第 1 条（`SLRAND` 接受 Bytes）、第 10 条（异常归类）
 - DEC-0006 第 1、5、11、12 条（脚本域、EVAL 的禁用指令、本地输出、校验域）

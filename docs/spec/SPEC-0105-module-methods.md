@@ -7,9 +7,9 @@
 
 ## 来源追溯
 
-- `conception/Instruction/17.模块指令.md`：静态索引与动态方法名两种调用方式；内置对象（Time、RegExp、BigInt）没有构造方法；多个返回值封装为切片；`MO_MATH` 的 1–7、`MO_FMT` 的 1–3 与示例（构想层原有）；其余方法为本轮回填（原为「待补充」）
-- `conception/Instruction/14.工具指令.md`：`CALL` 及其示例（`Day`、`Clock`、`Format`、`Abs`、`Pow`、`Sprint`）
-- `conception/Instruction/18.扩展指令.md`：`EXT_MO`
+- `conception/17.模块指令.md`：静态索引与动态方法名两种调用方式；内置对象（Time、RegExp、BigInt）没有构造方法；多个返回值封装为切片；`MO_MATH` 的 1–7、`MO_FMT` 的 1–3 与示例（构想层原有）；其余方法为本轮回填（原为「待补充」）
+- `conception/14.工具指令.md`：`CALL` 及其示例（`Day`、`Clock`、`Format`、`Abs`、`Pow`、`Sprint`）
+- `conception/18.扩展指令.md`：`EXT_MO`
 - DEC-0001 第 3 条（时间：公共域开放数值读取，只认 UTC 与固定偏移；`Format`、`Local`、`In` 私有）
 - DEC-0004 第 2 条（方法表属于版本的取值表，随版本冻结）
 - DEC-0005 开放问题（2026-11-06 已关闭：BigInt 的取模与幂由 `MO_BINT` 提供）

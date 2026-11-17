@@ -11,8 +11,8 @@
 - DEC-0002 第 1 条（宿主没有实现的宿主指令视为未分配）
 - DEC-0003 第 1 条（加载顺序）
 - `conception/Design.md`：未知码位处理、附：版本关系、附：分叉种类
-- `conception/Instruction/14.工具指令.md`：`CALL`、保留区 156–163
-- `conception/Instruction/16.函数指令.md`、`17.模块指令.md`、`18.扩展指令.md`：索引空间，静态索引与动态方法名
+- `conception/14.工具指令.md`：`CALL`、保留区 156–163
+- `conception/16.函数指令.md`、`17.模块指令.md`、`18.扩展指令.md`：索引空间，静态索引与动态方法名
 
 
 ## 概述

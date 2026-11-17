@@ -107,8 +107,8 @@ Evidcoin 按规则的变化方向把分叉分为三种（`Design.md`「附：分
 ## 构想层依据
 
 - `conception/Design.md`：未知码位处理、附：版本关系、附：分叉种类
-- `conception/Instruction/14.工具指令.md`：`CALL`（方法受版本约束）、保留区（156–163）
-- `conception/Instruction/16.函数指令.md`、`17.模块指令.md`、`18.扩展指令.md`：索引空间、静态索引与动态方法名两种调用方式
+- `conception/14.工具指令.md`：`CALL`（方法受版本约束）、保留区（156–163）
+- `conception/16.函数指令.md`、`17.模块指令.md`、`18.扩展指令.md`：索引空间、静态索引与动态方法名两种调用方式
 - `working/Evidcoin设计参考.md`：输出项配置（版本字节、配置字节）
 - 评审问答：P1-7，Q6，第四轮、第五轮
 

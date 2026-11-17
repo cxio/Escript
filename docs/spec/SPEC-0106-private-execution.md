@@ -7,11 +7,11 @@
 
 ## 来源追溯
 
-- `conception/Instruction/1.值指令.md`：浮点数（私有域）
-- `conception/Instruction/5.交互指令.md`：`INPUT`、`OUTPUT`、`BUFDUMP`、`PRINT`，缓存区
+- `conception/1.值指令.md`：浮点数（私有域）
+- `conception/5.交互指令.md`：`INPUT`、`OUTPUT`、`BUFDUMP`、`PRINT`，缓存区
 - `conception/Design.md`：私有专属、空操作（公共域）
-- `conception/Instruction/15.系统指令.md`：`SYS_TIME`；`16.函数指令.md`：`FN_PRINTF`、`FN_PRIV`；`18.扩展指令.md`：`EXT_PRIV`
-- `conception/Instruction/17.模块指令.md`：`MO_FMT`
+- `conception/15.系统指令.md`：`SYS_TIME`；`16.函数指令.md`：`FN_PRINTF`、`FN_PRIV`；`18.扩展指令.md`：`EXT_PRIV`
+- `conception/17.模块指令.md`：`MO_FMT`
 - DEC-0005 第 2 条（Float 只用于私有执行）
 - DEC-0006 第 11 条（公共 / 私有两种执行模式，本地输出的开启）
 - SPEC-0005 第 10 条、SPEC-0008 第 7 条

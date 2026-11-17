@@ -11,13 +11,13 @@
 - DEC-0004 第 1、5 条（版本号在输出结构中；创建时的检查为共识，成本的计入方式）
 - DEC-0007 第 4 条与「影响」（三层预算；Evidcoin 区块预算及其前提）
 - `conception/Design.md`：附：版本关系（预发布）、附：分叉种类、附：系统占位符、例：币金支付验证、例：定制验证、参数限定
-- `conception/Instruction/AGENTS.md`：历史交易的携带与缓存
-- `conception/Instruction/1.值指令.md`：`SCRIPT`、`GVAL`
-- `conception/Instruction/6.结果指令.md`：`GOTO`、`EMBED` 的引用附参
-- `conception/Instruction/13.环境指令.md`：`ENV`、`IN`、`OUT`、`INOUT`、`XFROM` 的条目，`SIGNED` 的序位
-- `conception/Instruction/15.系统指令.md`：`SYS_AWARD`、`SYS_CHKPASS`
-- `conception/Instruction/16.函数指令.md`：`FN_ADDRESS`、`FN_PUBHASH`、`FN_MPUBHASH`、`FN_CHECKSIG`、`FN_MCHECKSIG`
-- `conception/Instruction/14.工具指令.md`：`SHELL` 提取的来源输出数据
+- `conception/AGENTS.md`：历史交易的携带与缓存
+- `conception/1.值指令.md`：`SCRIPT`、`GVAL`
+- `conception/6.结果指令.md`：`GOTO`、`EMBED` 的引用附参
+- `conception/13.环境指令.md`：`ENV`、`IN`、`OUT`、`INOUT`、`XFROM` 的条目，`SIGNED` 的序位
+- `conception/15.系统指令.md`：`SYS_AWARD`、`SYS_CHKPASS`
+- `conception/16.函数指令.md`：`FN_ADDRESS`、`FN_PUBHASH`、`FN_MPUBHASH`、`FN_CHECKSIG`、`FN_MCHECKSIG`
+- `conception/14.工具指令.md`：`SHELL` 提取的来源输出数据
 - `working/Evidcoin设计参考.md`：签名、多重签名、签名消息与授权种类、前置检查、输出项配置
 - SPEC-0006 第 1、4 条，SPEC-0007 第 1、6、7 条，SPEC-0008（宿主规格必须包含的内容与接口契约）
 
@@ -186,7 +186,7 @@ total = 窗口内的交易数
 | 8 | `Locked` | Bytes | 输出的锁定脚本 | 是 | |
 
 - n 不小于输出集的大小即失败（按位置，SPEC-0104 第 2.1 条）。
-- `INOUT` 需要来源交易的其它输出。节点缺少这些数据、交易也没有携带验证上下文时，结果为数据不可用（构想层 `Instruction/AGENTS.md`）。
+- `INOUT` 需要来源交易的其它输出。节点缺少这些数据、交易也没有携带验证上下文时，结果为数据不可用（构想层 `AGENTS.md`）。
 
 #### 3.5 `XFROM`
 
@@ -261,7 +261,7 @@ total = 窗口内的交易数
 | 节点缺少相应的历史数据，交易也没有携带有效的验证上下文 | 数据不可用 |
 
 - 目标必须位于当前区块之前已确认的区块中。同一区块或内存池中的交易不是可引用的目标。
-- 交易可以携带验证上下文：目标输出及其默克尔路径（构想层 `Instruction/AGENTS.md`；输出项内容与脚本超过 64 字节时以摘要参与计算，见 `Evidcoin设计参考.md`「配置/状态」）。宿主验证路径到本节点已有的区块头。路径无效时按没有携带处理，结果只取决于节点自己的数据。
+- 交易可以携带验证上下文：目标输出及其默克尔路径（构想层 `AGENTS.md`；输出项内容与脚本超过 64 字节时以摘要参与计算，见 `Evidcoin设计参考.md`「配置/状态」）。宿主验证路径到本节点已有的区块头。路径无效时按没有携带处理，结果只取决于节点自己的数据。
 - 成本按 SPEC-0006 第 3 条的外部加载计，与上下文的来源无关。
 
 ### 6. 签名验证

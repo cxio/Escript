@@ -10,10 +10,10 @@
 - DEC-0005 数值、类型与异常：第 1、2、3、5、11 条
 - DEC-0004 第 1 条（Script 携带版本）
 - DEC-0001 第 3 条（时间只认 UTC 与固定偏移；数据栈 `[]any` 属于实现细节）
-- `conception/Instruction/1.值指令.md`：各值类型、值集的提升规则、`DICT`
-- `conception/Instruction/4.集合指令.md`：切片、字典，集合指令对 Bytes 的友好支持
-- `conception/Instruction/8.转换指令.md`：`TIME`、`BYTES(Time)`；Bytes 不是 `[]Byte`
-- `conception/Instruction/12.模式指令.md`：类型名清单
+- `conception/1.值指令.md`：各值类型、值集的提升规则、`DICT`
+- `conception/4.集合指令.md`：切片、字典，集合指令对 Bytes 的友好支持
+- `conception/8.转换指令.md`：`TIME`、`BYTES(Time)`；Bytes 不是 `[]Byte`
+- `conception/12.模式指令.md`：类型名清单
 
 
 ## 概述

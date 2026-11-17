@@ -11,9 +11,9 @@
 - DEC-0004 第 2 条（成本表与限额随版本冻结）
 - DEC-0005 第 1 条（Bytes 是普通数据项，`[]Byte` 是切片）
 - `conception/Design.md`：安全性（参数限定、执行成本、实现参考）
-- `conception/Instruction/1.值指令.md`：正则 ≤ 255 字节、BigInt ≤ 127 字节
-- `conception/Instruction/2.截取指令.md`：局部域容量 128
-- `conception/Instruction/13.环境指令.md`：全局变量 256 个位置、`SOURCE`
+- `conception/1.值指令.md`：正则 ≤ 255 字节、BigInt ≤ 127 字节
+- `conception/2.截取指令.md`：局部域容量 128
+- `conception/13.环境指令.md`：全局变量 256 个位置、`SOURCE`
 
 
 ## 概述

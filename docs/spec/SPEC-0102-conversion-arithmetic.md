@@ -7,9 +7,9 @@
 
 ## 来源追溯
 
-- `conception/Instruction/8.转换指令.md`：转换表、`STRING` 的固定格式、`ANYS`；`BYTES([]Byte)`、`ANYS{Byte}` 对 Bytes 的转换；`BYTES(Float)`、`FLOAT(Bytes)`
-- `conception/Instruction/9.运算指令.md`：表达式、符号指令、命名运算指令、`DIVMOD`、`REP`、`DEL`、`CLEAR`
-- `conception/Instruction/10.比较指令.md`、`11.逻辑指令.md`
+- `conception/8.转换指令.md`：转换表、`STRING` 的固定格式、`ANYS`；`BYTES([]Byte)`、`ANYS{Byte}` 对 Bytes 的转换；`BYTES(Float)`、`FLOAT(Bytes)`
+- `conception/9.运算指令.md`：表达式、符号指令、命名运算指令、`DIVMOD`、`REP`、`DEL`、`CLEAR`
+- `conception/10.比较指令.md`、`11.逻辑指令.md`
 - DEC-0001 第 2、3 条（RFC 3339、UTF-8；`strconv` / `math/big` 的行为由 Spec 定义）
 - DEC-0005 第 1–8、10 条（Bytes 与 `[]Byte`、Float、提升、溢出、比较、拼接与合并、转换的补充规则、PACK 对 Nil 成员的忽略）
 - DEC-0006 第 10 条（表达式的求值）

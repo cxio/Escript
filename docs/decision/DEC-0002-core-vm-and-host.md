@@ -103,11 +103,11 @@ type Env struct {
 ## 构想层依据
 
 - `README.md`：通用化定位
-- `conception/Instruction/AGENTS.md`：历史交易的携带与缓存
-- `conception/Instruction/13.环境指令.md`：`ENV`、`IN`、`OUT`、`INOUT`、`XFROM` 字段
-- `conception/Instruction/14.工具指令.md`：`SHELL`
-- `conception/Instruction/15.系统指令.md`：`SYS_AWARD`、`SYS_CHKPASS`
-- `conception/Instruction/16.函数指令.md`：`FN_ADDRESS`、`FN_PUBHASH`、`FN_MPUBHASH`
+- `conception/AGENTS.md`：历史交易的携带与缓存
+- `conception/13.环境指令.md`：`ENV`、`IN`、`OUT`、`INOUT`、`XFROM` 字段
+- `conception/14.工具指令.md`：`SHELL`
+- `conception/15.系统指令.md`：`SYS_AWARD`、`SYS_CHKPASS`
+- `conception/16.函数指令.md`：`FN_ADDRESS`、`FN_PUBHASH`、`FN_MPUBHASH`
 - `conception/Design.md`：附：系统占位符；附：`SYS_CHKPASS` 超级赎回
 - `working/Evidcoin设计参考.md`：签名、签名消息、交易的前置检查、输出项配置
 - 评审问答：P2-1、P1-6、P1-5、Q7，第四轮

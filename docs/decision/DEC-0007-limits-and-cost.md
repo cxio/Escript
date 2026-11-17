@@ -131,10 +131,10 @@ EACH 的迭代次数取决于集合大小，嵌套几层就是指数级；循环
 ## 构想层依据
 
 - `conception/Design.md`：安全性（参数限定、执行成本）
-- `conception/Instruction/2.截取指令.md`：局部域容量 128
-- `conception/Instruction/13.环境指令.md`：`VAR` / `SETVAR` 的 256 个位置、`SOURCE`
-- `conception/Instruction/9.运算指令.md`：表达式附参为 1 字节
-- `conception/Instruction/1.值指令.md`：正则 ≤ 255 字节、BigInt ≤ 127 字节
+- `conception/2.截取指令.md`：局部域容量 128
+- `conception/13.环境指令.md`：`VAR` / `SETVAR` 的 256 个位置、`SOURCE`
+- `conception/9.运算指令.md`：表达式附参为 1 字节
+- `conception/1.值指令.md`：正则 ≤ 255 字节、BigInt ≤ 127 字节
 - 评审问答：P0-7、P1-6，Q8、Q15
 
 

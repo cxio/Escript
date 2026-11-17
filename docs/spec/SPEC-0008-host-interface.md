@@ -11,10 +11,10 @@
 - DEC-0004 第 1 条（版本号在宿主的输出结构中）
 - DEC-0006 第 11、12 条（公共 / 私有执行，校验域）
 - DEC-0007 第 4 条（预算的配置层级）
-- `conception/Instruction/13.环境指令.md`：`ENV`、`IN`、`OUT`、`INOUT`、`XFROM` 的字段
-- `conception/Instruction/1.值指令.md`：`GVAL`
-- `conception/Instruction/16.函数指令.md`：`FN_ADDRESS`、`FN_PUBHASH`、`FN_MPUBHASH`、`FN_CHECKSIG`、`FN_MCHECKSIG`
-- `conception/Instruction/15.系统指令.md`：`SYS_AWARD`、`SYS_CHKPASS`
+- `conception/13.环境指令.md`：`ENV`、`IN`、`OUT`、`INOUT`、`XFROM` 的字段
+- `conception/1.值指令.md`：`GVAL`
+- `conception/16.函数指令.md`：`FN_ADDRESS`、`FN_PUBHASH`、`FN_MPUBHASH`、`FN_CHECKSIG`、`FN_MCHECKSIG`
+- `conception/15.系统指令.md`：`SYS_AWARD`、`SYS_CHKPASS`
 
 
 ## 概述

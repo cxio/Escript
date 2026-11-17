@@ -117,13 +117,13 @@
 ## 构想层依据
 
 - `conception/Design.md`：锁定&解锁（解锁数据、边界处理）、解析规则、附：系统占位符
-- `conception/Instruction/0.基本约束.md`：指令的结构
-- `conception/Instruction/1.值指令.md`：各值指令的编码
-- `conception/Instruction/2.截取指令.md`：截取前缀
-- `conception/Instruction/6.结果指令.md`：`RETURN` 的位置约束
-- `conception/Instruction/7.流程控制.md`：IF / ELSE、SWITCH / CASE、BREAK、CONTINUE 的约束
-- `conception/Instruction/9.运算指令.md`：符号指令只能用于表达式内
-- `conception/Instruction/12.模式指令.md`：MODEL 附参的取值标记、模式指令的作用范围
+- `conception/0.基本约束.md`：指令的结构
+- `conception/1.值指令.md`：各值指令的编码
+- `conception/2.截取指令.md`：截取前缀
+- `conception/6.结果指令.md`：`RETURN` 的位置约束
+- `conception/7.流程控制.md`：IF / ELSE、SWITCH / CASE、BREAK、CONTINUE 的约束
+- `conception/9.运算指令.md`：符号指令只能用于表达式内
+- `conception/12.模式指令.md`：MODEL 附参的取值标记、模式指令的作用范围
 - 评审问答：P0-1、P0-6、P0-8、P1-8，Q1、Q12、Q14
 
 

@@ -7,8 +7,8 @@
 
 ## 来源追溯
 
-- `conception/Instruction/0.基本约束.md`：指令的结构、脚本行为
-- `conception/Instruction/1.值指令.md` ～ `7.流程控制.md`：opcode 0–66 的定义与示例
+- `conception/0.基本约束.md`：指令的结构、脚本行为
+- `conception/1.值指令.md` ～ `7.流程控制.md`：opcode 0–66 的定义与示例
 - `conception/Design.md`：数据栈、实参空间、指令的参数配置、自动展开
 - DEC-0002 第 1 条（`GVAL`、`SCRIPT` 的宿主部分）
 - DEC-0004 第 1 条（`CODE`、`SCRIPT` 创建的 Script 的版本）

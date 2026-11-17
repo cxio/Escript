@@ -171,14 +171,14 @@
 ## 构想层依据
 
 - `conception/Design.md`：实参空间、指令的参数配置、空操作（公共域）、私有专属、锁定&解锁
-- `conception/Instruction/0.基本约束.md`：脚本行为（结束、失败、中断退出）
-- `conception/Instruction/2.截取指令.md`：局部域、截取前缀
-- `conception/Instruction/5.交互指令.md`：`INPUT`
-- `conception/Instruction/6.结果指令.md`：`PASS`、`CHECK`、`GOTO`、`EMBED`、`EXIT`、`RETURN`、`END`
-- `conception/Instruction/7.流程控制.md`：IF / ELSE、SWITCH / CASE、EACH、BREAK、CONTINUE
-- `conception/Instruction/9.运算指令.md`：表达式
-- `conception/Instruction/13.环境指令.md`：`ENV{Passed}`、`SIGNED`、`SOURCE`
-- `conception/Instruction/14.工具指令.md`：`EVAL`、`MAP`、`FILTER`
+- `conception/0.基本约束.md`：脚本行为（结束、失败、中断退出）
+- `conception/2.截取指令.md`：局部域、截取前缀
+- `conception/5.交互指令.md`：`INPUT`
+- `conception/6.结果指令.md`：`PASS`、`CHECK`、`GOTO`、`EMBED`、`EXIT`、`RETURN`、`END`
+- `conception/7.流程控制.md`：IF / ELSE、SWITCH / CASE、EACH、BREAK、CONTINUE
+- `conception/9.运算指令.md`：表达式
+- `conception/13.环境指令.md`：`ENV{Passed}`、`SIGNED`、`SOURCE`
+- `conception/14.工具指令.md`：`EVAL`、`MAP`、`FILTER`
 - 评审问答：P0-1、P0-2、P0-3、P0-8、P1-3、P1-4，Q2–Q5、Q13、Q16
 
 
