@@ -153,7 +153,7 @@ while count < limit and pos ≤ len(input):
 #### 3.4 `MATCH[f, n]`（141）
 
 - 实参 1：String 或 Bytes。实参 2：RegExp。
-- 附参 1（f）：匹配方式。附参 2（n）：匹配数量，0 表示全部〔R-52〕。
+- 附参 1（f）：匹配方式。附参 2（n）：匹配数量上限，0 表示全部〔R-52〕。
 - 按 f 查找（第 1 条）。结果中的文本与实参 1 同类型（String 或 Bytes）〔R-31〕：
 
 | f | 结果 | 没有匹配时 |
