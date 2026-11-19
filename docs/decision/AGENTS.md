@@ -26,7 +26,7 @@
 | DEC-0004 | [DEC-0004-versioning-and-upgrade.md](DEC-0004-versioning-and-upgrade.md) | 脚本版本与升级：版本号、冻结内容、未分配码位与未知版本即失败、通过新版本升级、创建时的检查 |
 | DEC-0005 | [DEC-0005-values-types-errors.md](DEC-0005-values-types-errors.md) | 数值、类型与异常：浮点限制、类型提升、溢出、比较、转换、错误分类 |
 | DEC-0006 | [DEC-0006-execution-semantics.md](DEC-0006-execution-semantics.md) | 执行语义：通关状态机、执行上下文、块与局部域、表达式求值、公私模式 |
-| DEC-0007 | [DEC-0007-limits-and-cost.md](DEC-0007-limits-and-cost.md) | 资源限额与成本模型：硬限额、成本函数、初始成本表、预算 |
+| DEC-0007 | [DEC-0007-limits-and-cost.md](DEC-0007-limits-and-cost.md) | 资源限额与成本模型：硬限额、成本函数、初始成本表、预算与增量额度、交易费与成本 |
 
 
 **维护规则：**

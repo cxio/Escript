@@ -25,7 +25,7 @@
 | SPEC-0003 | `SPEC-0003-load-validation.md` | 加载期校验：段与加载时点、加载步骤、规范解码、结构规则、表达式文法、模式体、段级规则、加载期成本 |
 | SPEC-0004 | `SPEC-0004-value-model.md` | 值模型：类型、Float 规则、数值提升、比较、值语义、`size` |
 | SPEC-0005 | `SPEC-0005-execution-model.md` | 执行模型：状态、实参与去向、块与局部域、通关状态机、结果、公共 / 私有执行、GOTO / EMBED / EVAL / MAP / FILTER、循环与 SWITCH、校验域 |
-| SPEC-0006 | `SPEC-0006-limits-and-cost.md` | 硬限额与检查时点、成本框架与计费时点、成本记法（`K`、`B(x)`）、初始成本表、三层预算 |
+| SPEC-0006 | `SPEC-0006-limits-and-cost.md` | 硬限额与检查时点、成本框架与计费时点、成本记法（`K`、`B(x)`）、初始成本表、三层预算、硬上限与增量额度 |
 | SPEC-0007 | `SPEC-0007-versioning.md` | 版本号、每段的版本、版本冻结的表、未分配与未知版本即失败、跨版本规则、升级规则（预发布） |
 | SPEC-0008 | `SPEC-0008-host-interface.md` | 宿主接口：宿主规格的必备内容、`ENV` 索引划分与核心字段、环境、接口契约、创建时的检查、执行结果与标记、私有执行 |
 | SPEC-0101 | `SPEC-0101-core-instructions.md` | 指令语义的通用约定（0101–0106 共用）；值、截取、栈操作、集合、交互、结果、流程控制指令 |
