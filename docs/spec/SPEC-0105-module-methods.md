@@ -169,7 +169,7 @@ YearDay = days − (该年 1 月 1 日的 days) + 1
 | 15 | `BitLen(x)` | Int | `K` | \|x\| 的位数；0 为 0 |
 | 16 | `Bit(x, i)` | Int | `K` | x 的二进制补码表示中第 i 位（0 或 1），i ≥ 0 |
 | 17 | `IsInt64(x)` | Bool | `K` | 是否在 int64 范围内 |
-| 18 | `FillBytes(x, i)` | Bytes | `K` | \|x\| 的大端表示，左侧补零到 i 字节；放不下即失败；0 ≤ i ≤ 8191 |
+| 18 | `FillBytes(x, i)` | Bytes | `K` | \|x\| 的大端表示，左侧补零到 i 字节；放不下即失败；0 ≤ i ≤ 8192 |
 
 - 「欧几里得除法」与 Go `big.Int` 的 `Div`、`Mod`、`DivMod` 相同；「截断除法」与 `Quo`、`Rem`、`QuoRem` 相同。
 - `Pow`：e 为整数类且 ≥ 0。|x| ≥ 2 时，应在计算之前按 (bitlen(|x|) − 1) × e ≥ 1016 判断结果必然超限并失败。
