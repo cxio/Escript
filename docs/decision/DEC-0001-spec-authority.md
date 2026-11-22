@@ -2,7 +2,7 @@
 
 - 状态：Accepted
 - 日期：2026-10-28
-- 修订：2026-11-01（`FN_ADDRESS` 改由宿主定义，见 DEC-0002）；2026-11-04（`FN_BASE58` 不含校验和；Evidcoin 地址改为 Bech32v）；2026-11-08（`STRING(Byte)` 为一字节封装〔R-24〕；`MO_TIME` 公共方法补固定偏移换算与时刻运算〔R-33〕）；2026-11-09（`STRING` 取消格式附参）
+- 修订：2026-11-01（`FN_ADDRESS` 改由宿主定义，见 DEC-0002）；2026-11-04（`FN_BASE58` 不含校验和；Evidcoin 地址改为 Bech32v）；2026-11-08（`STRING(Byte)` 为一字节封装〔R-24〕；`MO_TIME` 公共方法补固定偏移换算与时刻运算〔R-33〕）；2026-11-09（`STRING` 取消格式附参）；2026-11-22（`INT(String)` 兼容 `0` 前缀八进制；浮点的文本转换仅私有执行，`RANDOM` 的 Float 分支按 DEC-0005 第 2 条的修订表述）
 - 覆盖评审条目：P0-5（Q10、Q11）
 
 
@@ -53,7 +53,7 @@
 | 时间 | 公共域开放数值读取（年、月、日、时、分、秒、毫秒、Unix 时间戳）以及只依赖整数运算的固定偏移换算与时刻运算（`UTC`、`InOffset`、`AddMilli`、`AddDate`、`Sub`〔R-33〕）。时区只认 UTC 和固定偏移。`Format`、`Local`、`In` 等依赖格式化或时区数据库的方法为私有域专属。`MO_TIME` 与 Time 对象的方法表按此标注公/私（见 DEC-0004） |
 | 随机数 | 采用构想层 `RANDOM` / `SLRAND` 已写明的 BLAKE3 keyed + XOF 算法，见第 4 条 |
 | 变长整数 | 规范解码规则见 DEC-0003 |
-| `strconv` / `math/big` | 由 Spec 定义：`INT(String)` 接受的文本文法（按构想层：可选符号、十进制或 `0b` / `0o` / `0x` 前缀，兼容 `0` 前缀八进制、数字间单下划线分隔）；`STRING(Int)` 为十进制（负号在前、无前导零，0 为 `"0"`）；`STRING(BigInt)` 为 `0x` 加十六进制（数位大写、无前导零，负数写作 `-0x…`，0 为 `"0x0"`）；`STRING(Bool)` 为 `"True"` / `"False"`；`STRING(Byte)` 为含该字节的一字节字符串，不转义、不检查 UTF-8；`STRING(Rune)` 为该码点的 UTF-8；`STRING(Float)` 为 `strconv.FormatFloat(x, 'g', -1, 64)`（仅私有执行）；BigInt 的位运算语义（二进制补码，见 DEC-0005） |
+| `strconv` / `math/big` | 由 Spec 定义：`INT(String)` 接受的文本文法（按构想层：可选符号、十进制或 `0b` / `0o` / `0x` 前缀，兼容 `0` 前缀八进制、数字间单下划线分隔）；`STRING(Int)` 为十进制（负号在前、无前导零，0 为 `"0"`）；`STRING(BigInt)` 为 `0x` 加十六进制（数位大写、无前导零，负数写作 `-0x…`，0 为 `"0x0"`）；`STRING(Bool)` 为 `"True"` / `"False"`；`STRING(Byte)` 为含该字节的一字节字符串，不转义、不检查 UTF-8；`STRING(Rune)` 为该码点的 UTF-8；`STRING(Float)` 为 `strconv.FormatFloat(x, 'g', -1, 64)`，`FLOAT(String)` 按 `strconv.ParseFloat(s, 64)`（两者仅私有执行，DEC-0005 第 2 条）；BigInt 的位运算语义（二进制补码，见 DEC-0005） |
 | 数据栈 `[]any` | 属于实现细节。Spec 按 DEC-0005 的值模型定义数据栈，不涉及 Go 类型 |
 
 ### 4. 随机数算法的补充约定
@@ -64,7 +64,7 @@
 - 每次 `RANDOM` / `SLRAND` 调用都从 XOF 输出流的起点开始读取。同一种子、同一实参，结果相同。
 - tag 是 ASCII 字节串，按构想层写法为 `Escript/RANDOM/v1` 与 `Escript/SLRAND/v1`（大小写敏感）。
 
-`RANDOM` 的 Float 分支在公共域会产生 Float，按 DEC-0005 即失败，只在私有域有效。
+`RANDOM` 的 Float 分支要做浮点乘法，按 DEC-0005 第 2 条在公共域即失败，只在私有域有效。
 
 ### 5. 测试向量
 
