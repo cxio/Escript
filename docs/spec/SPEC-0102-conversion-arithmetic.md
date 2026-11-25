@@ -2,7 +2,7 @@
 
 - 状态：Accepted
 - 日期：2026-11-06
-- 修订：2026-11-08（Bytes 与 `[]Byte` 分立：`BYTE(Bytes)`、`BYTES([]Byte)`、`ANYS{Byte}` 接受 Bytes，DEC-0005 第 7 条）；2026-11-11（Nil 不再转到基本类型、String、Bytes、Time；`STRING` 取消格式附参；`ANYS` 的标识改为 0、1、3–8、10）；2026-11-13（第 4 条：一边是 Nil 时相等比较不失败）；2026-11-15（第 2.4 条：写明 `PACK` 对 Nil 成员的忽略不改变 `BYTES`；`BYTES(Float)` 为 IEEE 754 原始位的大端 8 字节；第 2.1 条：`FLOAT(Bytes)` 为上述编码的逆运算）；2026-11-16（第 4 条：`ISEFV` 的标识 1、2 按构想层对调为 −Inf、+Inf）；2026-11-18（第 2.3 条：增加 `STRING(RegExp)`，结果为两侧带 `/` 的正则字面量写法，新增第 2.3.1 条：对控制字符、不成对的 `/` 与 `\Q…\E` 的改写，结果可以超过 255 字节；第 2.4 条：写明 `BYTES(RegExp)` 不含两侧的 `/`）；2026-11-22（作者修订：第 2.2 条兼容 `0` 前缀八进制，第 5 条 `SOME` 的空切片为 false；按构想层浮点规则：Float 的精确转换在公共执行中照常，`FLOAT(String)`、`STRING(Float)` 仅私有，运算与数值比较在公共执行中即失败，`ISEFV` 私有专属，撤回 R-06；第 2.2 条补齐八进制前导零的判定与 `"08"` 等情形）
+- 修订：2026-11-08（Bytes 与 `[]Byte` 分立：`BYTE(Bytes)`、`BYTES([]Byte)`、`ANYS{Byte}` 接受 Bytes，DEC-0005 第 7 条）；2026-11-11（Nil 不再转到基本类型、String、Bytes、Time；`STRING` 取消格式附参；`ANYS` 的标识改为 0、1、3–8、10）；2026-11-13（第 4 条：一边是 Nil 时相等比较不失败）；2026-11-15（第 2.4 条：写明 `PACK` 对 Nil 成员的忽略不改变 `BYTES`；`BYTES(Float)` 为 IEEE 754 原始位的大端 8 字节；第 2.1 条：`FLOAT(Bytes)` 为上述编码的逆运算）；2026-11-16（第 4 条：`ISEFV` 的标识 1、2 按构想层对调为 −Inf、+Inf）；2026-11-18（第 2.3 条：增加 `STRING(RegExp)`，结果为两侧带 `/` 的正则字面量写法，新增第 2.3.1 条：对控制字符、不成对的 `/` 与 `\Q…\E` 的改写，结果可以超过 255 字节；第 2.4 条：写明 `BYTES(RegExp)` 不含两侧的 `/`）；2026-11-22（作者修订：第 2.2 条兼容 `0` 前缀八进制，第 5 条 `SOME` 的空切片为 false；按构想层浮点规则：Float 的精确转换在公共执行中照常，`FLOAT(String)`、`STRING(Float)` 仅私有，运算与数值比较在公共执行中即失败，`ISEFV` 私有专属，撤回 R-06；第 2.2 条补齐八进制前导零的判定与 `"08"` 等情形）；2026-11-25（第 2.1 条：从 String 按位置取字节也用 `INDEX`，DEC-0005 第 9 条）
 
 
 ## 来源追溯
@@ -54,7 +54,7 @@
 - Float 的行与 `FLOAT` 的列中，除「仅私有」的 `FLOAT(String)` 外都是精确转换，公共执行中照常（DEC-0005 第 2 条）：`FLOAT(Int)` 按 IEEE 754 就近舍入（等距时取偶数），`INT(Float)` 向零截断，`BOOL(Float)` 只判断是否为 ±0（+0 与 −0 都是 false，NaN 为 true）。这些结果由位模式唯一确定，不依赖平台。
 
 - Nil 以及表中没有的类型即失败（DEC-0005 第 10 条）。`BOOL` 另外不接受切片、Bytes、Dict。判断非空用 `SIZE BOOL`。
-- `INT(Bytes)` 与 `BYTES(Int)` 互逆，`BYTE(Bytes)` 与 `BYTES(Byte)` 互逆（DEC-0005 第 7 条）。从 Bytes 中按位置读取单个字节用 `INDEX`（SPEC-0101 第 5.7 条）。
+- `INT(Bytes)` 与 `BYTES(Int)` 互逆，`BYTE(Bytes)` 与 `BYTES(Byte)` 互逆（DEC-0005 第 7 条）。从 Bytes 或 String 中按位置读取单个字节用 `INDEX`，直接得到 Byte（SPEC-0101 第 5.7 条）。
 - `FLOAT(Bytes)` 与 `BYTES(Float)` 互逆（DEC-0005 第 7 条）：实参是恰好 8 字节的 Bytes，按大端序组成 uint64，以 `math.Float64frombits` 还原。任意位模式都成功，包括 −0、±Inf 与 NaN 载荷，不做规范化（−0 的规范化只约束字面量，SPEC-0004 第 3 条）。长度不是 8 即失败。实参是 Bytes，不是 `[]Byte`。两种执行中结果相同。
 - 成本：`K`；`INT(String)` 为 `K + B(输入字节)`；`BIGINT` 的 `D` 为结果字节数。
 

@@ -2,7 +2,7 @@
 
 - 状态：Accepted
 - 日期：2026-10-28
-- 修订：2026-11-01（并入作者回答：Time 的运算由 `MO_TIME` 提供）；2026-11-06（开放问题 1 关闭：BigInt 的取模与幂由 `MO_BINT` 提供）；2026-11-08（作者决定：Bytes 与 `[]Byte` 是两个类型，取消别名；第 1、5、6、7、8 条相应修订）；2026-11-11（Nil 不再转到基本类型、String、Bytes、Time）；2026-11-13（第 5 条：Nil 与不可比较的类型做相等比较为「不相等」而不是失败，与构想层 `10.比较指令.md` 对齐）；2026-11-15（第 8、10 条：PACK 忽略切片中的 Nil 成员；第 7、8 条：`BYTES(Float)` 为 IEEE 754 原始位的大端 8 字节，以及 `FLOAT(Bytes)` 的逆运算）；2026-11-22（作者修订构想层浮点规则：第 2 条重写，公共域中 Float 可以编码、传递与精确转换，运算、数值比较、`ISEFV` 与文本转换即失败；第 1、5、7 条与理由、影响相应修订）；2026-11-22（第 2 条：opcode 124 的上下界可以是 ±Inf，比较仍由 IEEE 754 唯一确定）
+- 修订：2026-11-01（并入作者回答：Time 的运算由 `MO_TIME` 提供）；2026-11-06（开放问题 1 关闭：BigInt 的取模与幂由 `MO_BINT` 提供）；2026-11-08（作者决定：Bytes 与 `[]Byte` 是两个类型，取消别名；第 1、5、6、7、8 条相应修订）；2026-11-11（Nil 不再转到基本类型、String、Bytes、Time）；2026-11-13（第 5 条：Nil 与不可比较的类型做相等比较为「不相等」而不是失败，与构想层 `10.比较指令.md` 对齐）；2026-11-15（第 8、10 条：PACK 忽略切片中的 Nil 成员；第 7、8 条：`BYTES(Float)` 为 IEEE 754 原始位的大端 8 字节，以及 `FLOAT(Bytes)` 的逆运算）；2026-11-22（作者修订构想层浮点规则：第 2 条重写，公共域中 Float 可以编码、传递与精确转换，运算、数值比较、`ISEFV` 与文本转换即失败；第 1、5、7 条与理由、影响相应修订）；2026-11-22（第 2 条：opcode 124 的上下界可以是 ±Inf，比较仍由 IEEE 754 唯一确定）；2026-11-25（构想层：集合指令对 String 按字节处理。第 1、6、7、9、11 条：撤回「`SLICE` 对 String 即失败」；`SLICE`、`REVERSE`、`MERGE`、`EXTEND`、`INDEX` 接受 String；取消 `PACK` 的 Bytes 实参，切片成员为 Bytes 时仍按 `BYTES` 转换）
 - 覆盖评审条目：P0-4、P1-1、P1-2、P2-5（Q5、Q9）
 
 
@@ -20,9 +20,10 @@
 Nil、Bool、Byte、Rune、Int（int64）、BigInt（绝对值不超过 1016 位）、Float（float64；公共域只作数据，第 2 条）、String、Bytes、RegExp、Time、Script、切片（具体类型的切片与 `[]any`）、Dict、模块 / 对象。
 
 - **Bytes 与 `[]Byte` 是两个类型**（作者决定，取消第一轮回答中的别名含义）。Bytes 是一个整体的字节序列，与 String 同属普通数据项（DEC-0007），可以比较、拼接。`[]Byte` 是成员类型为 Byte 的切片，与 `[]Int` 等一样适用切片的全部规则：受成员数上限约束，不可比较。
-- **Bytes 只在写明的指令中代替切片**：`SLICE`、`REVERSE`、`MERGE`、`EXTEND`、`PACK`、`INDEX`、`SIZE`（构想层 `4.集合指令.md`）与 `SLRAND`（`14.工具指令.md`）。`INDEX` 的单个位置得到 Byte；位置集总是得到值集，目标为 Bytes 时得到 `[]Byte`。其余要求切片的指令，包括 `SPREAD`、`EACH`、`MAP`、`FILTER`，不接受 Bytes，需先用 `ANYS{Byte}` 转为 `[]Byte`（第 7 条）。
+- **Bytes 只在写明的指令中代替切片**：`SLICE`、`REVERSE`、`MERGE`、`EXTEND`、`INDEX`、`SIZE`（构想层 `4.集合指令.md`）与 `SLRAND`（`14.工具指令.md`）。`INDEX` 的单个位置得到 Byte；位置集总是得到值集，目标为 Bytes 时得到 `[]Byte`。其余要求切片的指令，包括 `PACK`、`SPREAD`、`EACH`、`MAP`、`FILTER`，不接受 Bytes，需先用 `ANYS{Byte}` 转为 `[]Byte`（第 7 条）。`PACK` 的切片成员仍可以是 Bytes（第 8 条）。
+- **String 只在写明的集合指令中按字节处理**：`SLICE`、`REVERSE`、`MERGE`、`EXTEND`、`INDEX`、`SIZE`（第 9 条）。位置与长度都是字节数。`INDEX` 的单个位置得到 Byte，位置集得到 `[]Byte`。`PACK`、`SPREAD` 以及 `EACH`、`MAP`、`FILTER` 不接受 String。
 - 成员全为 Byte 的值集得到 `[]Byte`（构想层 `1.值指令.md`）；Bytes 的字面量是 `DATA`。
-- **String 不检查 UTF-8 合法性**，按字节比较。
+- **String 不检查 UTF-8 合法性**，按字节比较。`SLICE`、`REVERSE`、`MERGE`、`EXTEND` 的结果仍是 String，可以是非法 UTF-8。
 - Script 携带版本号（DEC-0004）。
 
 ### 2. Float 在公共域只作数据（Q9；2026-11-22 作者修订）
@@ -83,7 +84,7 @@ Time 不参与运算指令（`ADD`、`SUB` 等对 Time 即失败）。时长加�
 ### 6. 拼接与合并
 
 - `ADD` 只允许 String + String、Bytes + Bytes，混用即失败。结果受单项大小上限约束（DEC-0007）。
-- `MERGE` 的实参全为 Bytes 时，结果是首尾相接的 Bytes；Bytes 与切片（包括 `[]Byte`）混用即失败。`EXTEND` 的目标为 Bytes 时，追加的成员必须是 Byte，结果为 Bytes。
+- `MERGE` 的实参必须同属一类：全为切片、全为 Bytes，或全为 String。全为 Bytes 时结果是首尾相接的 Bytes；全为 String 时结果是首尾相接的 String。三类之间混用即失败，包括 Bytes 与 `[]Byte`。`EXTEND` 的目标为 Bytes 或 String 时，追加的成员必须是 Byte，结果与目标同类型。
 - 字典合并（`ADD`）返回一个新字典：先保留左侧的键及其顺序，右侧新增的键按其顺序追加，重复的键取右侧的值。
 
 ### 7. 转换的补充规则
@@ -95,7 +96,7 @@ Time 不参与运算指令（`ADD`、`SUB` 等对 Time 即失败）。时长加�
 - `INT(String)` 解析失败即失败。
 - `BOOL` 不接受切片、字典、Bytes。判空用 `SIZE BOOL`。
 - `BYTES(Int)` 为 8 字节大端补码，`INT(Bytes)` 要求恰好 8 字节、按大端补码还原，两者对称。
-- `BYTE` 接受恰好 1 字节的 Bytes，与 `BYTES(Byte)` 对称。按位置从 Bytes 中读取单个字节用 `INDEX`，直接得到 Byte。
+- `BYTE` 接受恰好 1 字节的 Bytes，与 `BYTES(Byte)` 对称。按位置从 Bytes 或 String 中读取单个字节用 `INDEX`，直接得到 Byte（第 9 条）。
 - Bytes 与 `[]Byte` 的互转：`BYTES([]Byte)` 把成员依次复制为 Bytes；`ANYS{Byte}`（`ANYS[3]`）把 Bytes 转为 `[]Byte`。`ANYS` 的其它标识（包括 `ANYS[0]`）不接受 Bytes，需要 `[]any` 时先转为 `[]Byte`。转换的结果是切片，受成员数上限约束，超过 1024 字节的 Bytes 不能整体转为 `[]Byte`。
 - `BYTES(BigInt)` 与 `BIGINT(Bytes)` 只处理绝对值，会丢失符号。这是已知的局限，在指令说明中提示。
 - `BYTES(Float)` 取该值的 IEEE 754 binary64 原始位（`math.Float64bits`），按大端序写成固定 8 字节，与浮点字面量的 `f64be` 相同。+0、−0、NaN 的载荷和 ±Inf 都按原位写出。这是位模式搬运，不是浮点运算，结果是 Bytes。`FLOAT(Bytes)` 是它的逆运算，实参必须恰好是 8 字节，按大端序读成 uint64，再用 `math.Float64frombits` 还原，−0、±Inf 与 NaN 载荷都原样还原。两者都是公共域可用的精确转换（第 2 条）。
@@ -107,13 +108,15 @@ Time 不参与运算指令（`ADD`、`SUB` 等对 Time 即失败）。时长加�
 
 值为 Nil 的直接成员忽略，无转换操作。切片为空，或成员全部被忽略时，结果为空 Bytes。成员不能转为 Bytes 时失败。Nil 忽略只属于 `PACK`，发生在转换之前。
 
-实参也可以是 Bytes 本身，此时结果与 `BYTES(Bytes)` 相同（构想层）。
+实参必须是切片。切片的成员仍可以是 Bytes，按 `BYTES(Bytes)` 写入结果。
 
 PACK 的结果不带长度信息，`["ab", "c"]` 与 `["a", "bc"]` 的结果相同。用于哈希承诺时，如果成员长度可变，应先固定长度或自行加入长度字段。这一点在指令说明中提示。
 
-### 9. SLICE 与字符串
+### 9. 集合指令与字符串
 
-`SLICE` 只用于切片和 Bytes，对 String 使用即失败，以免切断 UTF-8 字符。字符串截取用 `SUBSTR`。
+`SLICE`、`REVERSE`、`MERGE`、`EXTEND`、`INDEX` 接受 String，与 Bytes 一样按字节处理，不按符文，也不检查或修复 UTF-8。`SLICE` 与 `REVERSE` 的结果仍是 String，切分点或逆序可以落在一个字符的中间，结果可以是非法 UTF-8。`INDEX` 的单个位置得到 Byte，位置集得到 `[]Byte`。`EXTEND` 追加的成员必须是 Byte。`MERGE` 把多个 String 首尾相接。
+
+按符文截取仍用 `SUBSTR`。`PACK` 与 `SPREAD` 不接受 String。
 
 ### 10. 异常处理的归类（P1-2）
 
@@ -130,8 +133,8 @@ Nil 流入后续指令时：参与算术即失败；转到基本类型、String�
 ### 11. 值语义
 
 - **除字典外，所有值不可变。** 产生新内容的运算总是返回新值。
-- `SLICE` 与原切片共享底层数组。因为切片不可变，共享是安全的，且效率更高。
-- `EXTEND` 先复制底层数组再扩展，不会写穿共享的父切片。
+- `SLICE` 可以与原切片、Bytes 或 String 共享底层字节。因为这些值不可变，共享不可见。
+- `EXTEND` 先复制再扩展，不会写穿已有的切片、Bytes 或 String。
 - 字典可以被 `SET`、`DEL`、`CLEAR` 就地修改；`COPY` 是浅复制。
 - **字典的值（递归地，包括值中切片的成员）不能包含字典**（Q5）。在 `DICT`、`SET`、字典合并时检查，违反即失败。切片可以包含字典。
 
@@ -148,6 +151,7 @@ Nil 流入后续指令时：参与算术即失败；转到基本类型、String�
 - **表达式不接受 BigInt**：遵从构想层符号指令的类型定义，表达式保持为简单的 Int 运算。BigInt 的运算本来就需要按字数计成本（DEC-0007），留在命名指令里更清楚。
 - **PACK 在转换之前忽略 Nil**：构想层已写明切片中的 Nil 成员直接忽略。忽略留在 `PACK` 内、发生在查表之前，因此仍然只有一张 `BYTES` 表，Nil 没有字节编码。
 - **浮点与 Bytes 只搬位**：构想层用 `math.Float64bits` 与 `math.Float64frombits` 的大端 8 字节，两个方向逐位互逆。给定同一个位模式，各平台的结果相同；跨平台差异只可能来自产生该 Float 的运算，不来自这两次转换。
+- **String 的集合操作按字节**：构想层把 String 在 `INDEX`、`EXTEND`、`SIZE` 中的成员定义为 Byte，`SLICE` 的示例也按字节下标截取。与 `SPLIT` 对字符串「按字节长度对待」一致。符文边界留给 `SUBSTR`。
 
 
 ## 影响
@@ -160,6 +164,7 @@ Nil 流入后续指令时：参与算术即失败；转到基本类型、String�
 - 测试向量需要覆盖每一类溢出、除零、移位越界、代理区、跨类别比较。
 - `PACK` 跳过切片中值为 Nil 的直接成员；空切片与成员全部被忽略时结果为空 Bytes。测试向量覆盖 Nil 在首、中、尾，全部为 Nil，以及 Nil 与不能转换的成员同时存在。
 - `BYTES(Float)` 与 `FLOAT(Bytes)` 逐位互逆。测试向量覆盖往返（+0、−0、一个有限值、±Inf、载荷不被清掉的 NaN），以及长度不是 8 字节时 `FLOAT(Bytes)` 失败。含浮点数成员的 `PACK`、`ANYS{Bytes}` 使用同一编码。两者在公共域与私有域中结果相同。
+- String 的 `SLICE`、`REVERSE`、`MERGE`、`EXTEND`、`INDEX` 按字节处理。测试向量覆盖构想层示例，以及多字节字符被切断或逆序后结果仍为 String、可以是非法 UTF-8。`MERGE` 中 String 与 Bytes 或切片混用即失败。`PACK` 的实参为 Bytes 或 String 即失败；`SPREAD` 遇到 String 即失败。
 - 构想层 `9.运算指令.md` 中 `MOD`、`POW` 写的是「输入什么类型返回什么类型」，按第 3 条，Byte、Rune 输入的结果是 Int。
 - 值的内部表示必须区分 Bytes 与 `[]Byte`。限额与成本中，Bytes 按普通数据项处理，`[]Byte` 按切片处理，两者都不是对方的例外。
 
@@ -167,7 +172,7 @@ Nil 流入后续指令时：参与算术即失败；转到基本类型、String�
 ## 构想层依据
 
 - `conception/1.值指令.md`：各值类型、值集的提升规则、DICT；浮点数的规则与设计（公共域可编码、传递、确定性转换，计算含比较仅限私有域，-0 => +0）
-- `conception/4.集合指令.md`：SLICE、EXTEND、PACK、INDEX、ITEM、SET；集合指令对 Bytes 的友好支持
+- `conception/4.集合指令.md`：SLICE、EXTEND、PACK、INDEX、ITEM、SET；集合指令对 Bytes 与 String 的友好支持（String 按字节）
 - `conception/Design.md`「私有专属」：浮点数值指令在公共域仅可编码、存取、转换；`ISEFV` 为私有专属
 - `conception/8.转换指令.md`：转换表；`Bytes` 不是 `[]Byte`；`BYTES([]Byte)`、`ANYS{Byte}`；`BYTES(Float)`、`FLOAT(Bytes)`
 - `conception/9.运算指令.md`：各运算指令支持的类型、表达式
